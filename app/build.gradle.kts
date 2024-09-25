@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.myprojects.prueba1"
+        applicationId = "com.myprojects.myTickets"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -23,13 +26,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Prueba1"
+        android:theme="@style/Theme.MyTickets"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.myprojects.myTickets.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Prueba1">
+            android:theme="@style/Theme.MyTickets">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

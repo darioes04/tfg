@@ -1,9 +1,8 @@
-package com.myprojects.prueba1
+package com.myprojects.myTickets
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,10 +11,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.myprojects.prueba1.permissions.PermissionManager
-import com.myprojects.prueba1.ui.theme.Prueba1Theme
-import com.myprojects.prueba1.utils.CameraUtils
-import com.myprojects.prueba1.utils.GalleryUtils
+import com.myprojects.myTickets.permissions.PermissionManager
+import com.myprojects.myTickets.ui.theme.MyTicketsTheme
+import com.myprojects.myTickets.utils.CameraUtils
+import com.myprojects.myTickets.utils.GalleryUtils
 
 class MainActivity : ComponentActivity() {
 
@@ -38,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            Prueba1Theme {
+            MyTicketsTheme {
                 HomeScreen(
                     onCameraClick = {
                         CameraUtils.takePicture(this, takePictureLauncher) { uri ->

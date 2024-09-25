@@ -1,4 +1,4 @@
-package com.myprojects.prueba1
+package com.myprojects.myTickets
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.myprojects.prueba1.ui.theme
+package com.myprojects.myTickets.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

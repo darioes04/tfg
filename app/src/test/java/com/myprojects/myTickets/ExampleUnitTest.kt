@@ -1,4 +1,4 @@
-package com.myprojects.prueba1
+package com.myprojects.myTickets
 
 import org.junit.Test
 
