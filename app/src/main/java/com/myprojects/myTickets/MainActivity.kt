@@ -3,6 +3,7 @@ package com.myprojects.myTickets
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import com.myprojects.myTickets.permissions.PermissionManager
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.CameraUtils
 import com.myprojects.myTickets.utils.GalleryUtils
+import com.myprojects.myTickets.utils.MLKitUtils
 
 class MainActivity : ComponentActivity() {
 
@@ -81,11 +83,15 @@ class MainActivity : ComponentActivity() {
 
     // Procesar la imagen confirmada
     private fun processImage(imageUri: Uri?) {
-        imageUri?.let {
-            Toast.makeText(this, "Imagen confirmada y lista para ser procesada", Toast.LENGTH_SHORT).show()
+        imageUri?.let { uri ->
+            MLKitUtils.processImageWithMLKit(uri, this) { extractedText ->
+                // Aquí obtienes el texto extraído de la imagen
+                Toast.makeText(this, "Texto extraído: $extractedText", Toast.LENGTH_LONG).show()
+
+                // Puedes enviar el texto extraído a la API de ChatGPT
+                val prompt = "El texto extraído de la imagen es: $extractedText"
+                Log.d("Texto extraido", prompt)
+            }
         }
     }
-
-
-
 }

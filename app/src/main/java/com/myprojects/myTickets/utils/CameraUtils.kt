@@ -39,6 +39,7 @@ object CameraUtils {
     private fun createImageFile(context: ComponentActivity): File {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
         return File.createTempFile(
             "JPEG_${timeStamp}_", /* prefix */
             ".jpg", /* suffix */

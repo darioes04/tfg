@@ -12,5 +12,6 @@ object GalleryUtils {
             type = "image/*"
         }
         galleryLauncher.launch(intent)
+
     }
 }
