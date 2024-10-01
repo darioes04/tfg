@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.0")
+    implementation (libs.gson)  // Para guardar y leer JSON
+    implementation (libs.okhttp)  // Para hacer llamadas HTTP
     implementation(libs.text.recognition)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx)
@@ -60,6 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.generativeai)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

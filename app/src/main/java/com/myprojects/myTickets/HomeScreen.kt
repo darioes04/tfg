@@ -1,6 +1,7 @@
 package com.myprojects.myTickets
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,12 +17,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.myprojects.prueba1.R
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+
 
 @Composable
 fun HomeScreen(
@@ -30,16 +37,35 @@ fun HomeScreen(
     selectedImageUri: Uri? = null,
     onConfirmImage: () -> Unit = {}
 ) {
+
+    /*val customFontFamily = FontFamily(
+        Font(R.font.playfairdisplay_variable_font_wght) // Reemplaza con el nombre de tu archivo de fuente
+    )*/
+
+    val googleFontProvider = GoogleFont.Provider(
+        providerAuthority = "com.google.android.gms.fonts",
+        providerPackage = "com.google.android.gms",
+        certificates = R.array.com_google_android_gms_fonts_certs
+    )
+
+    val fontName = GoogleFont("Roboto")
+    val fontFamily = FontFamily(
+        Font(googleFont = fontName, fontProvider = googleFontProvider, weight = FontWeight.Bold)
+    )
+
     Scaffold(
         topBar = {
             Text(
                 text = "MyTickets",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier
+                    .padding(top= 26.dp)
                     .padding(16.dp)
                     .fillMaxWidth(),
                 color = Color.Black,
+
                 textAlign = TextAlign.Center
             )
         },
@@ -48,6 +74,7 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(Color.Cyan)
                     .padding(paddingValues),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
