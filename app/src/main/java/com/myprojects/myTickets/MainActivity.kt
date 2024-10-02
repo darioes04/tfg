@@ -13,13 +13,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.myprojects.myTickets.permissions.PermissionManager
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.CameraUtils
-import com.myprojects.myTickets.utils.CloudVisionUtils
 import com.myprojects.myTickets.utils.GalleryUtils
-import com.myprojects.myTickets.utils.MLKitUtils
-import com.myprojects.myTickets.utils.callCohereWithCoroutines
+import com.myprojects.myTickets.utils.GeminiUtils
 import com.myprojects.myTickets.utils.callOpenAIWithCoroutines
 import java.io.File
 
@@ -89,31 +88,10 @@ class MainActivity : ComponentActivity() {
 
     // Procesar la imagen confirmada
     private fun processImage(imageUri: Uri?) {
-        imageUri?.let { uri ->
-           CloudVisionUtils.processImageWithCloudVision(this, uri) { jsonResponse ->
-                // Mostrar el resultado
-                Toast.makeText(this, "Resultado guardado en JSON", Toast.LENGTH_LONG).show()
-                val fullText = CloudVisionUtils.extractFullTextFromJson(jsonResponse)
-                Log.d("CloudVisionAPI", "Respuesta de la API: $fullText")
-
-               val prompt = "dame estos datos extraidos en formato json  con: Nombre Restaurante, " +
-                       "CIF, Fecha y hora, items y sus precios, precio total sin iva, IVA, precio " +
-                       "con iva. Asegurate de que solo se incluyan estos datos, hazlo en español. En" +
-                       "caso de haber caracteres extraños, eliminalos"
-
-               if (fullText != null) {
-                   callCohereWithCoroutines(fullText, prompt)
-               }
-           }
+        val response = GeminiUtils.processImageWithGemini(this, imageUri) {
         }
+        Log.d("GeminiAPI", "Respuesta de la API: $response")
     }
-
-
-
-
-
-
-
 
 
 }

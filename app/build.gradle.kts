@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.0")
     implementation (libs.gson)  // Para guardar y leer JSON
     implementation (libs.okhttp)  // Para hacer llamadas HTTP
