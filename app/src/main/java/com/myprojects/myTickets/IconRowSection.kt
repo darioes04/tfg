@@ -25,9 +25,10 @@ fun IconRowSection(onCameraClick: () -> Unit, onGalleryClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
-            .fillMaxHeight()
             .fillMaxWidth()
             .padding(16.dp)
+            .padding(bottom = 10.dp)
+
     ) {
         // Ícono para abrir la cámara
         IconItem(

@@ -50,6 +50,8 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.navigation:navigation-compose:2.7.0")
+    implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.0")
     implementation (libs.gson)  // Para guardar y leer JSON
@@ -65,6 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.generativeai)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

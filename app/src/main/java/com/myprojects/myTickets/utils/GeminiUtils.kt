@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.InputStream
 
 object GeminiUtils {
@@ -27,23 +29,29 @@ object GeminiUtils {
             apiKey = "AIzaSyBYcj146sNM7ByeReP4D6dF7C58hXLPHkg"  // Reemplaza esto con tu clave API
         )
 
-        val prompt = "dame estos datos extraidos en formato json  con: Nombre Local,"+
-                "CIF, Fecha y hora, Tipo de comida(en caso de ser una franja horaria de 7am-12pm es desayuno, " +
-                "12pm-16pm es comida, 19pm-11pm es cena), items y sus precios (debes añadir" +
-                "el caracter € detras de los precios), precio total sin iva, IVA, precio"+
-                "con iva. Asegurate de que solo se incluyan estos datos, hazlo en español. En"+
-                "caso de haber caracteres extraños, eliminalos. Genera el json con todos los items,"+
-                "no te saltes ninguno ni lo des por hecho." +
+        val prompt = "genera un archivo json. La respuesta de la api debe ser exactamente con esta" +
+                "estructura: { JSON }"+
+                " Estos son los datos: restaurante," +
+                "cif (si el cif contiene el caracter - de separacion, eliminalo) fecha,hora, " +
+                "items(recuerda usar el termino item para" +
+                "el nombre de los productos) y sus precios (precioUnidad," +
+                "precioTotal), precioSinIva, iva, precioConIva. Asegurate de que solo se incluyan estos datos, hazlo en español. En" +
+                "caso de haber caracteres extraños, eliminalos. Genera el json con todos los items," +
+                "Los items deben contener los elementos: item, cantidad, precioUnidad, precioFinal"+
                 "Además, debes tener en cuenta que puede haber varias unidades de cada item, " +
                 "y eso puede afectar al precio final de cada item. Si se especifica las unidades del" +
-                "producto, debes indicar el precio de la unidad, y el precio final de la suma" +
-                "de la cantidad de items."
+                "producto, debes indicar la cantidad, el precioUnidad, y el precioFinal de la suma" +
+                "de la cantidad de items.Recuerda usar item para el nombre de los productos"+
+                "Los decimales deben mararcarse con el simbolo . no el simbolo ,"+
+                "Si hay otras comas "+
+                "Los precios deben ser de tipo double y no deben ir entre comillas nunca"+
+                "Ten en cuenta que los nombres de los atributos" +
+                "no pueden contener espacios, deben ir unidos por el caracter _"+
+                "si la hora no se especifica, poner en hora: no especificada."
 
 
-        // Launch a coroutine in the scope of the caller
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Convert the Uri to a Bitmap
                 val image1: Bitmap? = uriToBitmap(context, uri)
 
                 if (image1 == null) {
@@ -53,26 +61,34 @@ object GeminiUtils {
                     return@launch
                 }
 
-                // Build the content input with the image and the prompt
                 val inputContent = content {
-                    image(image1)  // Aquí es donde se usa la imagen en formato Bitmap
+                    image(image1)
                     text(prompt)
                 }
 
-                // Call the Gemini API to generate content
-                val response = generativeModel.generateContent(inputContent)
-                val res = response.text
-                Log.d("GeminiAPI", "Respuesta API: $res")
+                // Llamada a la API para generar contenido
+                val res = generativeModel.generateContent(inputContent).text
 
-                // Convert the response to a string or extract meaningful data from it
-                val responseContent = res ?: "Respuesta vacía de la API"
+                // Loguear la respuesta para verificar qué devuelve la API
+                Log.d("GeminiUtils", "Respuesta de la API: $res")
 
-                // Switch to Main thread to update the UI or return the result
+                // Verificar si la respuesta es un JSON o no
+                val responseContent = try {
+                    // Intentar convertir la respuesta en un objeto JSON
+                    val jsonResponse = JSONObject(res)
+                    jsonResponse.toString()  // Si es un JSON válido, devolverlo como cadena
+                } catch (e: JSONException) {
+                    // Si no es un JSON, es una cadena simple
+                    res ?: "Respuesta vacía de la API"
+                }
+
+                // Actualizar la UI o devolver el resultado
                 withContext(Dispatchers.Main) {
                     onResult(responseContent)
                 }
+
             } catch (e: Exception) {
-                Log.e("GeminiAPI", "Error generando contenido: ${e.message}")
+                Log.e("GeminiUtils", "Error generando contenido: ${e.message}")
                 withContext(Dispatchers.Main) {
                     onResult("Error: ${e.message}")
                 }
