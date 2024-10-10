@@ -7,6 +7,8 @@ import android.net.Uri
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.myprojects.myTickets.data.Constants
+import com.myprojects.prueba1.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,6 +19,8 @@ import java.io.InputStream
 
 object GeminiUtils {
 
+
+
     // Function to process the image with Gemini API
     fun processImageWithGemini(context: Context, uri: Uri?, onResult: (String) -> Unit) {
         if (uri == null) {
@@ -26,29 +30,10 @@ object GeminiUtils {
 
         val generativeModel = GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = "AIzaSyBYcj146sNM7ByeReP4D6dF7C58hXLPHkg"  // Reemplaza esto con tu clave API
+            apiKey = BuildConfig.API_KEY // Reemplaza esto con tu clave API
         )
 
-        val prompt = "genera un archivo json. La respuesta de la api debe ser exactamente con esta" +
-                "estructura: { JSON }"+
-                " Estos son los datos: restaurante," +
-                "cif (si el cif contiene el caracter - de separacion, eliminalo) fecha,hora, " +
-                "items(recuerda usar el termino item para" +
-                "el nombre de los productos) y sus precios (precioUnidad," +
-                "precioTotal), precioSinIva, iva, precioConIva. Asegurate de que solo se incluyan estos datos, hazlo en español. En" +
-                "caso de haber caracteres extraños, eliminalos. Genera el json con todos los items," +
-                "Los items deben contener los elementos: item, cantidad, precioUnidad, precioFinal"+
-                "Además, debes tener en cuenta que puede haber varias unidades de cada item, " +
-                "y eso puede afectar al precio final de cada item. Si se especifica las unidades del" +
-                "producto, debes indicar la cantidad, el precioUnidad, y el precioFinal de la suma" +
-                "de la cantidad de items.Recuerda usar item para el nombre de los productos"+
-                "Los decimales deben mararcarse con el simbolo . no el simbolo ,"+
-                "Si hay otras comas "+
-                "Los precios deben ser de tipo double y no deben ir entre comillas nunca"+
-                "Ten en cuenta que los nombres de los atributos" +
-                "no pueden contener espacios, deben ir unidos por el caracter _"+
-                "si la hora no se especifica, poner en hora: no especificada."
-
+        val prompt = Constants.prompt
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -75,7 +60,7 @@ object GeminiUtils {
                 // Verificar si la respuesta es un JSON o no
                 val responseContent = try {
                     // Intentar convertir la respuesta en un objeto JSON
-                    val jsonResponse = JSONObject(res)
+                    val jsonResponse = res?.let { JSONObject(it) }
                     jsonResponse.toString()  // Si es un JSON válido, devolverlo como cadena
                 } catch (e: JSONException) {
                     // Si no es un JSON, es una cadena simple

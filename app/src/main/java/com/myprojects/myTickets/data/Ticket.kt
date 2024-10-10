@@ -6,14 +6,14 @@ data class Ticket(
     val fecha: String,
     val hora: String,
     val items: List<Producto>,
-    val precioSinIva: Double,
-    val iva: Double,
-    val precioConIva: Double
+    val precioSinIva: String,
+    val iva: String,
+    val precioConIva: String
 )
 
 data class Producto(
     val item: String,
-    val cantidad: Int,
-    val precioUnidad: Double,
-    val precioFinal: Double
+    val cantidad: String,
+    val precioUnidad: String,
+    val precioFinal: String
 )

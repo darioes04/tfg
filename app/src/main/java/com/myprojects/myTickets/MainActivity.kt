@@ -25,20 +25,28 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.components.BuildConfig
+import com.myprojects.myTickets.database.TicketDatabaseHelper
 import com.myprojects.myTickets.ticketView.TicketScreen
 
 class MainActivity : ComponentActivity() {
 
+
     private var selectedImageUri by mutableStateOf<Uri?>(null)
+
+
 
     // Declarar los lanzadores
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
-
     private val ticketState = mutableStateOf<Ticket?>(null)
+    private lateinit var dbHelper: TicketDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inicializar la base de datos
+        dbHelper = TicketDatabaseHelper(this)
 
         // Verifica y solicita permisos en tiempo de ejecución
         PermissionManager.checkAndRequestPermissions(this)
@@ -78,9 +86,22 @@ class MainActivity : ComponentActivity() {
                     // Pantalla de TicketScreen donde se mostrará el ticket después del procesamiento
                     composable("ticketScreen") {
                         ticketState.value?.let { ticket ->
-                            TicketScreen(ticket)
+                            TicketScreen(
+                                ticket = ticket,
+                                onConfirmClick = { updatedTicket ->
+                                    val success = dbHelper.saveTicketWithProducts(updatedTicket)
+                                    if (success) {
+                                        Toast.makeText(this@MainActivity, "Ticket guardado correctamente", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("home")
+                                    } else {
+                                        Toast.makeText(this@MainActivity, "Error al guardar el ticket", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            )
                         }
                     }
+
+
                 }
             }
         }

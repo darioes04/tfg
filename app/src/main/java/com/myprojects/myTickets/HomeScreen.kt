@@ -41,25 +41,6 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            Text(
-                text = "MyTickets",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(50.dp),
-                fontSize = 50.5.sp, // Un poco más grande para crear el efecto de borde
-                fontWeight = FontWeight.ExtraBold,
-                fontFamily = FontFamily.Serif,
-                color = Color.Black, // Borde negro
-                style = TextStyle(
-                    shadow = Shadow(
-                        color = Color.Black,
-                        offset = Offset(4f, 4f),
-                        blurRadius = 6f
-                    )
-                ),
-                textAlign = TextAlign.Center
-            )
-
             // Texto principal encima del "borde"
             Text(
                 text = "MyTickets",
@@ -67,9 +48,9 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(top = 50.dp),
                 fontSize = 50.sp,
-                fontFamily = FontFamily.Serif,
+                fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White, // Texto blanco
+                color = Color.Black, // Texto blanco
                 style = TextStyle(
                     shadow = Shadow(
                         color = Color.Gray,
@@ -85,7 +66,7 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Cyan)
+                    .background(Color.White)
                     .padding(paddingValues),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally

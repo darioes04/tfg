@@ -1,20 +1,30 @@
 package com.myprojects.myTickets.ticketView
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketInfoRow(label: String, value: String, onValueChange: (String) -> Unit) {
     var textFieldValue by remember { mutableStateOf(value) }
@@ -22,37 +32,37 @@ fun TicketInfoRow(label: String, value: String, onValueChange: (String) -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),  // Espaciado vertical entre las filas
-        verticalAlignment = Alignment.CenterVertically  // Alinear verticalmente en el centro
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Atributo (etiqueta)
+        // Etiqueta
         Text(
             text = "$label: ",
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .weight(1f)  // Peso del texto de la etiqueta
-                .padding(end = 8.dp)  // Espacio entre la etiqueta y el campo de texto
+            modifier = Modifier.alignByBaseline() // Para alinear el texto
         )
 
-        // Campo editable (TextField)
-        OutlinedTextField(
+        // TextField sin contorno
+        BasicTextField(
             value = textFieldValue,
             onValueChange = {
                 textFieldValue = it
-                onValueChange(it)  // Actualiza el valor en la lógica principal
+                onValueChange(it)
             },
             modifier = Modifier
-                .weight(2f)  // Peso del campo de texto
-                .height(45.dp)  // Altura del campo de texto ajustada
-                .background(Color.Cyan),
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = androidx.compose.ui.unit.TextUnit.Unspecified
+                .alignByBaseline() // Alinea el campo con el texto de la etiqueta
+                .weight(1f) // El campo ocupará el resto del espacio disponible
+                .background(Color.Transparent), // Sin fondo ni contorno
+            textStyle = TextStyle(
+                color = Color.DarkGray,
+                fontSize = 16.sp // Puedes ajustar el tamaño de fuente según tus necesidades
             ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(40.dp),
+            singleLine = true
         )
     }
 }
+
 
 
 

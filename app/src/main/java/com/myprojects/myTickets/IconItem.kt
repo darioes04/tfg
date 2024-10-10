@@ -19,8 +19,7 @@ fun IconItem(iconRes: Int, description: String, onClick: () -> Unit = {}) {
         contentDescription = description,
         modifier = Modifier
             .size(150.dp) // Tamaño del ícono
-            .padding(8.dp) // Padding alrededor del ícono
-            .clip(CircleShape) // Padding alrededor del ícono
+            .padding(8.dp) // Padding alrededor del ícono // Padding alrededor del ícono
             .clickable { onClick() } // Agrega comportamiento al hacer clic
     )
 }

@@ -1,18 +1,33 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
 
+
+
 android {
     namespace = "com.myprojects.prueba1"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+
     defaultConfig {
+        val properties = Properties()
+        properties.load(project.rootProject.file("api.properties").inputStream())
+        buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
+
         applicationId = "com.myprojects.myTickets"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -38,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -50,10 +66,10 @@ android {
 }
 
 dependencies {
-    implementation ("androidx.navigation:navigation-compose:2.7.0")
-    implementation("com.google.code.gson:gson:2.8.8")
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
-    implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.0")
+    implementation (libs.androidx.navigation.compose)
+    implementation(libs.gson.v288)
+    implementation(libs.generativeai)
+    implementation (libs.androidx.ui.text.google.fonts.v170)
     implementation (libs.gson)  // Para guardar y leer JSON
     implementation (libs.okhttp)  // Para hacer llamadas HTTP
     implementation(libs.text.recognition)
