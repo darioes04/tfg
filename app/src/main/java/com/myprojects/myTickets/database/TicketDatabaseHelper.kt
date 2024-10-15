@@ -4,7 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
+import com.google.android.gms.analytics.ecommerce.Product
+import com.myprojects.myTickets.data.Producto
 import com.myprojects.myTickets.data.Ticket
 
 class TicketDatabaseHelper(context: Context) :
@@ -12,7 +13,7 @@ class TicketDatabaseHelper(context: Context) :
 
     companion object {
         private const val DATABASE_NAME = "tickets.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         // Nombre de la tabla y columnas
         const val TABLE_NAME = "tickets"
@@ -69,10 +70,8 @@ class TicketDatabaseHelper(context: Context) :
         val db = this.writableDatabase
         var success = false
 
-        // Iniciar una transacción para garantizar consistencia
         db.beginTransaction()
         try {
-            // Insertar el ticket en la tabla de tickets
             val contentValues = ContentValues().apply {
                 put("restaurante", ticket.restaurante)
                 put("cif", ticket.cif)
@@ -83,17 +82,9 @@ class TicketDatabaseHelper(context: Context) :
                 put("iva", ticket.iva)
             }
 
-            // Intentar insertar el ticket, y obtener el ID del registro
-            val ticketId = db.insertWithOnConflict("tickets", null,
-                contentValues, SQLiteDatabase.CONFLICT_REPLACE)
-            Log.d("Database", "Ticket insertado con ID: $ticketId")
+            val ticketId = db.insert("tickets", null, contentValues)
 
-
-            // Comprobar si la inserción del ticket ha sido exitosa
             if (ticketId != -1L) {
-                var allProductsInserted = true
-
-                // Insertar cada producto en la tabla de productos relacionado con el ticket
                 ticket.items.forEach { product ->
                     val productValues = ContentValues().apply {
                         put("item_name", product.item)
@@ -102,19 +93,118 @@ class TicketDatabaseHelper(context: Context) :
                         put("precio_final", product.precioFinal)
                         put("ticket_id", ticketId)
                     }
+                    db.insert("products", null, productValues)
+                }
+                db.setTransactionSuccessful()
+                success = true
+            }
+        } finally {
+            db.endTransaction()
+        }
+        return success
+    }
 
-                    // Comprobar si la inserción de cada producto ha sido exitosa
-                    val productInsertResult = db.insert("products", null, productValues)
-                    if (productInsertResult == -1L) {
-                        allProductsInserted = false  // Si algún producto falla, marcamos como fallo
+    fun getAllTickets(): List<Ticket> {
+        val tickets = mutableListOf<Ticket>()
+        val db = this.readableDatabase
+        val ticketQuery = "SELECT * FROM $TABLE_NAME"
+        val cursor = db.rawQuery(ticketQuery, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val ticketId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID))
+                val restaurante = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANTE))
+                val cif = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CIF))
+                val fecha = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FECHA))
+                val hora = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_HORA))
+                val precioSinIva = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRECIO_SIN_IVA))
+                val precioConIva = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRECIO_CON_IVA))
+                val iva = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IVA))
+
+                // Obtener los productos asociados a este ticket
+                val productQuery = "SELECT * FROM products WHERE ticket_id = ?"
+                val productCursor = db.rawQuery(productQuery, arrayOf(ticketId.toString()))
+                val products = mutableListOf<Producto>()
+
+                if (productCursor.moveToFirst()) {
+                    do {
+                        val itemName = productCursor.getString(productCursor.getColumnIndexOrThrow("item_name"))
+                        val precioUnidad = productCursor.getString(productCursor.getColumnIndexOrThrow("precio_unidad"))
+                        val cantidad = productCursor.getString(productCursor.getColumnIndexOrThrow("cantidad"))
+                        val precioFinal = productCursor.getString(productCursor.getColumnIndexOrThrow("precio_final"))
+
+                        val product = Producto(item = itemName, precioUnidad = precioUnidad, cantidad = cantidad, precioFinal = precioFinal)
+                        products.add(product)
+                    } while (productCursor.moveToNext())
+                }
+                productCursor.close()
+
+                // Crear el objeto Ticket y añadirlo a la lista
+                val ticket = Ticket(
+                    id = ticketId,
+                    restaurante = restaurante,
+                    cif = cif,
+                    fecha = fecha,
+                    hora = hora,
+                    precioSinIva = precioSinIva,
+                    precioConIva = precioConIva,
+                    iva = iva,
+                    items = products
+                )
+                tickets.add(ticket)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return tickets
+    }
+
+
+    fun updateTicket(ticket: Ticket): Boolean {
+        val db = this.writableDatabase
+        var success = false
+
+        // Iniciar una transacción para garantizar consistencia
+        db.beginTransaction()
+        try {
+            // Valores a actualizar en la tabla de tickets
+            val contentValues = ContentValues().apply {
+                put("restaurante", ticket.restaurante)
+                put("cif", ticket.cif)
+                put("fecha", ticket.fecha)
+                put("hora", ticket.hora)
+                put("precio_sin_iva", ticket.precioSinIva)
+                put("precio_con_iva", ticket.precioConIva)
+                put("iva", ticket.iva)
+            }
+
+            // Actualizar el ticket en la base de datos
+            val rowsAffected = db.update(
+                "tickets",
+                contentValues,
+                "id = ?",  // Actualiza donde el ID coincida
+                arrayOf(ticket.id.toString())  // Usamos el ID del ticket como referencia
+            )
+
+            if (rowsAffected > 0) {
+                // El ticket fue actualizado correctamente
+                // Primero eliminamos los productos antiguos del ticket para reemplazarlos
+                db.delete("products", "ticket_id = ?", arrayOf(ticket.id.toString()))
+
+                // Insertamos los productos actualizados del ticket
+                ticket.items.forEach { product ->
+                    val productValues = ContentValues().apply {
+                        put("item_name", product.item)
+                        put("precio_unidad", product.precioUnidad)
+                        put("cantidad", product.cantidad)
+                        put("precio_final", product.precioFinal)
+                        put("ticket_id", ticket.id)
                     }
+                    db.insert("products", null, productValues)
                 }
 
-                // Si todos los productos fueron insertados correctamente
-                if (allProductsInserted) {
-                    db.setTransactionSuccessful()  // Marcar la transacción como exitosa
-                    success = true  // Todos los productos se insertaron correctamente
-                }
+                db.setTransactionSuccessful()  // Marcar la transacción como exitosa
+                success = true
             }
         } finally {
             db.endTransaction()  // Finalizar la transacción
@@ -122,7 +212,6 @@ class TicketDatabaseHelper(context: Context) :
 
         return success
     }
-
 
 
 }

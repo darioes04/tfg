@@ -11,15 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-
+import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 
 
 @Composable
@@ -35,73 +32,66 @@ fun HomeScreen(
     onCameraClick: () -> Unit = {},
     onGalleryClick: () -> Unit = {},
     selectedImageUri: Uri? = null,
-    onConfirmImage: () -> Unit = {}
+    onConfirmImage: () -> Unit = {},
+    onNavigateToList: () -> Unit
 ) {
+    MyTicketsTheme {
+        Scaffold(
+            topBar = {
+                Text(
+                    text = "MyTickets",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 50.dp),
+                    fontSize = 50.sp,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground, // Cambia según el tema
+                    textAlign = TextAlign.Center
+                )
+            },
+            content = { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background) // Fondo adaptado al tema
+                        .padding(paddingValues),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
 
-    Scaffold(
-        topBar = {
-            // Texto principal encima del "borde"
-            Text(
-                text = "MyTickets",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 50.dp),
-                fontSize = 50.sp,
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.Black, // Texto blanco
-                style = TextStyle(
-                    shadow = Shadow(
-                        color = Color.Gray,
-                        offset = Offset(4f, 4f),
-                        blurRadius = 8f
-                    )
-                ),
-                textAlign = TextAlign.Center
-            )
-        },
-
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Si se selecciona una imagen, se muestra aquí
-                selectedImageUri?.let { uri ->
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = "Imagen seleccionada",
-                        modifier = Modifier
-                            .size(400.dp)
-                            .padding(16.dp)
-                    )
-
-                    // Botón para confirmar la imagen seleccionada
-                    Button(
-                        onClick = onConfirmImage,
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("Confirmar imagen")
+                    Button(onClick = onNavigateToList, modifier = Modifier.padding(16.dp)) {
+                        Text("Ver Tickets Guardados")
                     }
+
+                    selectedImageUri?.let { uri ->
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Imagen seleccionada",
+                            modifier = Modifier
+                                .size(400.dp)
+                                .padding(16.dp)
+                        )
+
+                        Button(
+                            onClick = onConfirmImage,
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text("Confirmar imagen")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    IconRowSection(onCameraClick = onCameraClick, onGalleryClick = onGalleryClick)
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Iconos para la cámara y galería
-                IconRowSection(onCameraClick = onCameraClick, onGalleryClick = onGalleryClick)
             }
-        }
-    )
+        )
+    }
 }
+
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    HomeScreen()  // Aquí no necesitamos pasar los callbacks, ya que los valores por defecto son funciones vacías.
+fun HomeScreen() {
 }
-
-

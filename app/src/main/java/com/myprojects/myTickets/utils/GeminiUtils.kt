@@ -33,7 +33,7 @@ object GeminiUtils {
             apiKey = BuildConfig.API_KEY // Reemplaza esto con tu clave API
         )
 
-        val prompt = Constants.prompt
+        val prompt = Constants.Prompt
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

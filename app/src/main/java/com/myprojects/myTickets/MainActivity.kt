@@ -19,14 +19,12 @@ import com.myprojects.myTickets.utils.GalleryUtils
 import com.myprojects.myTickets.utils.GeminiUtils
 import com.google.gson.Gson
 import com.myprojects.myTickets.data.Ticket
-
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.components.BuildConfig
 import com.myprojects.myTickets.database.TicketDatabaseHelper
+import com.myprojects.myTickets.ticketView.ListTicketScreen
 import com.myprojects.myTickets.ticketView.TicketScreen
 
 class MainActivity : ComponentActivity() {
@@ -61,10 +59,9 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "home" // Pantalla inicial
+                    startDestination = "home"
                 ) {
                     composable("home") {
-                        // Pantalla HomeScreen con la selección de imagen
                         HomeScreen(
                             onCameraClick = {
                                 CameraUtils.takePicture(this@MainActivity, takePictureLauncher) { uri ->
@@ -79,16 +76,20 @@ class MainActivity : ComponentActivity() {
                             selectedImageUri = selectedImageUri,
                             onConfirmImage = {
                                 processImage(selectedImageUri, navController)
+                            },
+                            onNavigateToList = {
+                                navController.navigate("listTicketScreen")
                             }
                         )
                     }
 
-                    // Pantalla de TicketScreen donde se mostrará el ticket después del procesamiento
+                    // Pantalla de edición de tickets
                     composable("ticketScreen") {
                         ticketState.value?.let { ticket ->
                             TicketScreen(
                                 ticket = ticket,
                                 onConfirmClick = { updatedTicket ->
+                                    // Guardar ticket o actualizar ticket
                                     val success = dbHelper.saveTicketWithProducts(updatedTicket)
                                     if (success) {
                                         Toast.makeText(this@MainActivity, "Ticket guardado correctamente", Toast.LENGTH_SHORT).show()
@@ -101,8 +102,38 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    composable("editTicketScreen") {
+                        ticketState.value?.let { ticket ->
+                            TicketScreen(
+                                ticket = ticket,
+                                onConfirmClick = { updatedTicket ->
+                                    // Guardar ticket o actualizar ticket
+                                    val success = dbHelper.updateTicket(updatedTicket)
+                                    if (success) {
+                                        Toast.makeText(this@MainActivity, "Ticket guardado correctamente", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("home")
+                                    } else {
+                                        Toast.makeText(this@MainActivity, "Error al guardar el ticket", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    composable("listTicketScreen") {
+                        ListTicketScreen(
+                            tickets = dbHelper.getAllTickets(), // Recuerda definir esta función
+                            onTicketClick = { ticket ->
+                                ticketState.value = ticket // Guardar el ticket seleccionado
+                                navController.navigate("editTicketScreen")}, // Navegar a la pantalla de edición
+                            onHomeClick = {
+                                navController.navigate("home") // Navegar de vuelta a HomeScreen
+                            }
+                        )
+                    }
 
                 }
+
             }
         }
     }

@@ -1,10 +1,13 @@
 package com.myprojects.myTickets.data
 
 object Constants{
-    const val prompt = "genera un archivo json. La respuesta de la api debe ser exactamente con esta" +
+    const val Prompt = "genera un archivo json. La respuesta de la api debe ser exactamente con esta" +
             "estructura: { JSON }"+
             " Estos son los datos: restaurante," +
-            "cif (si el cif contiene el caracter - de separacion, eliminalo) fecha,hora, " +
+            "cif (Si el cif contiene el caracter - de separacion, eliminalo." +
+            "Ten en cuenta que puede haber un espacio blanco de separacion entre numeros y letra," +
+            "en tal caso, une la latra a los numeoros." +
+            "Si se trata de un NIF, tambien guardalo en el cif) fecha,hora, " +
             "items(recuerda usar el termino item para" +
             "el nombre de los productos) y sus precios (precioUnidad," +
             "precioTotal), precioSinIva, iva (porcentaje), precioConIva. " +
