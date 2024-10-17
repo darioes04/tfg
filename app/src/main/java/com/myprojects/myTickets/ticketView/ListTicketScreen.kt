@@ -72,7 +72,7 @@ fun ListTicketScreen(tickets: List<Ticket>, onTicketClick: (Ticket) -> Unit, onH
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        Text(text = "Ticket: ${ticket.restaurante} - ${ticket.fecha}")
+                        Text(text = "${ticket.restaurante} - ${ticket.fecha}")
                     }
                 }
             }

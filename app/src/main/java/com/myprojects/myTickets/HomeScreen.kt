@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 
 
 @Composable
@@ -35,7 +34,7 @@ fun HomeScreen(
     onConfirmImage: () -> Unit = {},
     onNavigateToList: () -> Unit
 ) {
-    MyTicketsTheme {
+
         Scaffold(
             topBar = {
                 Text(
@@ -61,9 +60,6 @@ fun HomeScreen(
                 ) {
 
 
-                    Button(onClick = onNavigateToList, modifier = Modifier.padding(16.dp)) {
-                        Text("Ver Tickets Guardados")
-                    }
 
                     selectedImageUri?.let { uri ->
                         AsyncImage(
@@ -73,6 +69,7 @@ fun HomeScreen(
                                 .size(400.dp)
                                 .padding(16.dp)
                         )
+
 
                         Button(
                             onClick = onConfirmImage,
@@ -86,9 +83,25 @@ fun HomeScreen(
 
                     IconRowSection(onCameraClick = onCameraClick, onGalleryClick = onGalleryClick)
                 }
+            },
+            bottomBar = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(
+                        onClick = onNavigateToList,
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
+                        Text("Tickets Guardados")
+                    }
+                }
             }
         )
-    }
+
 }
 
 @Preview(showBackground = true)

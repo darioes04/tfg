@@ -213,5 +213,18 @@ class TicketDatabaseHelper(context: Context) :
         return success
     }
 
+    fun deleteTicket(idTicket: Long): Boolean {
+        val db = this.writableDatabase
+        return try {
+            val affectedRows = db.delete("tickets", "id=?", arrayOf(idTicket.toString()))
+            affectedRows > 0  // Devuelve true si se eliminó al menos una fila
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false  // Devuelve false si hubo algún error
+        } finally {
+            db.close()  // Cierra la base de datos después de la operación
+        }
+    }
+
 
 }

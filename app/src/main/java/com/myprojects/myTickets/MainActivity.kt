@@ -97,7 +97,12 @@ class MainActivity : ComponentActivity() {
                                     } else {
                                         Toast.makeText(this@MainActivity, "Error al guardar el ticket", Toast.LENGTH_SHORT).show()
                                     }
+                                },
+                                onClickDelete = {
+                                    Toast.makeText(this@MainActivity, "Ticket cancelado", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("home")
                                 }
+
                             )
                         }
                     }
@@ -114,6 +119,15 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("home")
                                     } else {
                                         Toast.makeText(this@MainActivity, "Error al guardar el ticket", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                onClickDelete = {idTicket ->
+                                    val success = dbHelper.deleteTicket(idTicket)
+                                    if (success) {
+                                        Toast.makeText(this@MainActivity, "Ticket eliminado correctamente", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("home")
+                                    } else {
+                                        Toast.makeText(this@MainActivity, "Error al eliminar el ticket", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             )

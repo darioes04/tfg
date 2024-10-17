@@ -15,8 +15,8 @@ data class Ticket(
 )
 
 data class Producto(
-    val item: String,
-    val cantidad: String,
-    val precioUnidad: String,
-    val precioFinal: String
+    var item: String,
+    var cantidad: String,
+    var precioUnidad: String,
+    var precioFinal: String
 )

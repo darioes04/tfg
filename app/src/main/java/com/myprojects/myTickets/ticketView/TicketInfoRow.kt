@@ -2,13 +2,16 @@ package com.myprojects.myTickets.ticketView
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -18,14 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TicketInfoRow(label: String, value: String, onValueChange: (String) -> Unit) {
+fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (String) -> Unit) {
     var textFieldValue by remember { mutableStateOf(value) }
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Etiqueta
         Text(
@@ -44,15 +47,18 @@ fun TicketInfoRow(label: String, value: String, onValueChange: (String) -> Unit)
                 onValueChange(it)
             },
             modifier = Modifier
-                .alignByBaseline()
-                .weight(1f)
                 .padding(horizontal = 4.dp)
-                .background(Color.Transparent),
+                .background(Color.Transparent)
+                .width(IntrinsicSize.Min),
             textStyle = TextStyle(
                 color = MaterialTheme.colorScheme.onBackground, // Ajuste de color automático
                 fontSize = 16.sp
             ),
-            singleLine = true
+        )
+        Text(
+            text = symbol,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.Bold,
         )
     }
 }

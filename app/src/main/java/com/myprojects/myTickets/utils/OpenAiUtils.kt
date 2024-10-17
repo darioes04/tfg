@@ -1,6 +1,8 @@
 package com.myprojects.myTickets.utils
 
 import android.util.Log
+import androidx.compose.ui.unit.Constraints
+import com.myprojects.myTickets.data.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,11 +20,11 @@ fun callOpenAIWithCoroutines(textExtracted: String, prompt: String) {
     // Ejecutar en una corrutina
     CoroutineScope(Dispatchers.IO).launch {
         // Concatenar el texto extraído con el prompt
-        val fullPrompt = "$prompt\n\nTexto extraído del OCR: $textExtracted"
+        val fullPrompt = Constants.Prompt
 
         // Construir el JSON del cuerpo de la solicitud
         val json = JSONObject().apply {
-            put("model", "gpt-3.5-turbo")
+            put("model", "gpt-4o")
             put("messages", JSONArray().put(JSONObject().apply {
                 put("role", "user")
                 put("content", fullPrompt)
@@ -34,7 +36,7 @@ fun callOpenAIWithCoroutines(textExtracted: String, prompt: String) {
         val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
             .url("https://api.openai.com/v1/chat/completions")
-            .addHeader("Authorization", "Bearer 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")
+            .addHeader("Authorization", "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")
             .post(requestBody)
             .build()
 
