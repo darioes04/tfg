@@ -1,8 +1,8 @@
 package com.myprojects.myTickets.data
 
 object Constants{
-    const val Prompt = "genera un archivo json. La respuesta de la api debe ser exactamente con esta" +
-            "estructura: { JSON }"+
+    const val Prompt = "genera un archivo json. La respuesta de la api unicamente debe devolver" +
+            "en la respuesta el archivo JSON, con la siguiente estructura:" +
             " Estos son los datos: restaurante," +
             "cif (Si el cif contiene el caracter - de separacion, eliminalo." +
             "Ten en cuenta que puede haber un espacio blanco de separacion entre numeros y letra," +
@@ -29,5 +29,6 @@ object Constants{
             "Ten en cuenta que el precio total corresponde a precio_con_iva"+
             "Tenemos el iva(en porcentaje)." +
             "Por ultimo (precio_sin_iva = precio_con_iva / (1 + iva)). Si iva es 10%, entonces" +
-            "precio_sin_iva = precio_con_iva / (1 + 0.1)"
+            "precio_sin_iva = precio_con_iva / (1 + 0.1)"+
+            "El formato de la fecha deber ser del tipo: dd/MM/YYYY"
 }

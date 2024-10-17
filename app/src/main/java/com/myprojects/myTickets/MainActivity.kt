@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.myprojects.myTickets.database.TicketDatabaseHelper
 import com.myprojects.myTickets.ticketView.ListTicketScreen
 import com.myprojects.myTickets.ticketView.TicketScreen
+import com.myprojects.myTickets.utils.OpenAiUtils
 
 class MainActivity : ComponentActivity() {
 
@@ -154,7 +155,7 @@ class MainActivity : ComponentActivity() {
 
     // Procesar la imagen confirmada
     private fun processImage(imageUri: Uri?, navController: NavHostController) {
-        GeminiUtils.processImageWithGemini(this, imageUri) { apiResponse ->
+        OpenAiUtils.processImageWithOpenAi(this, imageUri) { apiResponse ->
             // Aquí recibes la respuesta de la API en apiResponse
             if (apiResponse.startsWith("Error")) {
                 // Manejar el error
