@@ -16,108 +16,113 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.io.InputStream
 import android.util.Base64
+import org.json.JSONException
+import java.util.concurrent.TimeUnit
 
 
 object OpenAiUtils{
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
+        .readTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera para leer la respuesta
+        .writeTimeout(30, TimeUnit.SECONDS)   // Tiempo de espera para escribir la solicitud
+        .build()
 
     fun processImageWithOpenAi(context: Context, uri: Uri?, onResult: (String) -> Unit) {
-
         if (uri == null) {
             onResult("Error: URI es nula.")
             return
         }
-        // Ejecutar en una corrutina
+
+        // Definir el modelo y la clave de la API
+        val apiKey = "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"
+        val prompt = Constants.Prompt
+
         CoroutineScope(Dispatchers.IO).launch {
-            // Concatenar el texto extraído con el prompt
-            val prompt = Constants.Prompt
+            try {
+                val imageBase64: String? = uriToBase64(context, uri)
 
-            val image1: String? = uriToBase64(context, uri)
-            val image2: Bitmap? = uriToBitmap(context, uri)
-
-            if (image1 == null) {
-                withContext(Dispatchers.Main) {
-                    onResult(prompt)
+                if (imageBase64 == null) {
+                    withContext(Dispatchers.Main) {
+                        onResult("Error: No se pudo convertir la imagen.")
+                    }
+                    return@launch
                 }
-                return@launch
-            }
 
-            // Construir el JSON del cuerpo de la solicitud
-            val json = JSONObject().apply {
-                put("model", "gpt-4o-mini")
-                put("messages", JSONArray().put(JSONObject().apply {
-                    put("role", "user")
-                    put("content", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("type", "text")
-                            put("text", prompt)
-                        })
-                        put(JSONObject().apply {
-                            put("type", "image_url")
-                            put("image_url", JSONObject().apply {
-                                put("url", "data:image/jpeg;base64,$image1")
+                // Construir el JSON del cuerpo de la solicitud
+                val json = JSONObject().apply {
+                    put("model", "gpt-4o")
+                    put("messages", JSONArray().put(JSONObject().apply {
+                        put("role", "user")
+                        put("content", JSONArray().apply {
+                            put(JSONObject().apply {
+                                put("type", "text")
+                                put("text", prompt)
+                            })
+                            put(JSONObject().apply {
+                                put("type", "image_url")
+                                put("image_url", JSONObject().apply {
+                                    put("url", "data:image/jpeg;base64,$imageBase64")
+                                })
                             })
                         })
-                    })
-                }))
-                put("max_tokens", 300)
-            }
+                        put("max_tokens", 1000)
+                    }))
 
-            // Crear la solicitud POST
-            val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-            val request = Request.Builder()
-                .url("https://api.openai.com/v1/chat/completions")
-                .addHeader("Authorization", "Bearer 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")
-                .post(requestBody)
-                .build()
+                }
 
-            try {
-                // Hacer la llamada de red de forma sincrónica dentro de la corrutina
+                val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+                val request = Request.Builder()
+                    .url("https://api.openai.com/v1/chat/completions")
+                    .addHeader("Authorization", "Bearer $apiKey")
+                    .post(requestBody)
+                    .build()
+
                 val response = client.newCall(request).execute()
 
-                // Verificar el código de estado HTTP
                 if (!response.isSuccessful) {
                     Log.e("OpenAI Error", "Solicitud fallida con código: ${response.code}")
                     Log.e("OpenAI Error", "Cuerpo de la respuesta: ${response.body?.string()}")
                     return@launch
                 }
 
-                // Procesar la respuesta
                 val responseData = response.body?.string()
-                if (responseData != null) {
-                    Log.d("OpenAI Response", responseData)  // Imprime el cuerpo de la respuesta para depuración
+                val responseContent = responseData?.let {
+                    try {
+                        val jsonResponse = JSONObject(it)
 
-                    val jsonResponse = JSONObject(responseData)
-
-                    // Verificar si `choices` está presente
-                    if (jsonResponse.has("choices")) {
-                        val choices = jsonResponse.getJSONArray("choices")
-                        val responseText = choices.getJSONObject(0).getJSONObject("message").getString("content")
-
-                        // Volver al hilo principal para mostrar la respuesta en la UI
-                        withContext(Dispatchers.Main) {
-                            Log.d("OpenAI Response", responseText)
-                            onResult(responseText)
+                        if (jsonResponse.has("choices")) {
+                            val choices = jsonResponse.getJSONArray("choices")
+                            val res = choices.getJSONObject(0).getJSONObject("message").getString("content")
+                            try {
+                                JSONObject(res).toString()
+                            } catch (e: JSONException) {
+                                res
+                            }
+                        } else {
+                            "No se encontró el campo 'choices' en la respuesta."
                         }
-                    } else {
-                        // Manejar el caso cuando no hay `choices` en la respuesta
-                        Log.e("OpenAI Error", "No se encontró el campo 'choices' en la respuesta.")
-                        Log.e("OpenAI Error", "Cuerpo de la respuesta: $responseData")
+                    } catch (e: JSONException) {
+                        Log.e("OpenAI Error", "Error de JSON: ${e.message}")
+                        "Error al procesar la respuesta JSON."
                     }
+                } ?: "Error: Respuesta nula de la API."
+
+                withContext(Dispatchers.Main) {
+                    onResult(responseContent)
                 }
 
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Log.e("OpenAI Error", "Error de red: ${e.message}")
+
             } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e("OpenAI Error", "Error procesando la respuesta: ${e.message}")
+                Log.e("OpenAI Error", "Error procesando la solicitud: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    onResult("Error: ${e.message}")
+                }
             }
         }
     }
+
 
     // Function to convert URI to Bitmap
     private fun uriToBitmap(context: Context, uri: Uri): Bitmap? {

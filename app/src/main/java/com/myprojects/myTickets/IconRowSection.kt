@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -21,25 +22,12 @@ import com.myprojects.prueba1.R
 @Composable
 fun IconRowSection(onCameraClick: () -> Unit, onGalleryClick: () -> Unit) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp)
-            .padding(bottom = 10.dp)
-
     ) {
-        // Ícono para abrir la cámara
-        Image(
-            painter = painterResource(R.drawable.camera),
-            contentDescription = "Icono de la Cámara",
-            modifier = Modifier
-                .size(120.dp) // Tamaño del ícono
-                .padding(8.dp)
-                .clip(shape = RoundedCornerShape(30.dp))// Padding alrededor del ícono
-                .clickable { onCameraClick() } // Agrega comportamiento al hacer clic
-        )
-
 
         // Ícono para abrir la galería
         Image(
@@ -50,6 +38,17 @@ fun IconRowSection(onCameraClick: () -> Unit, onGalleryClick: () -> Unit) {
                 .padding(8.dp)
                 .clip(shape = RoundedCornerShape(40.dp))// Padding alrededor del ícono
                 .clickable { onGalleryClick() } // Agrega comportamiento al hacer clic
+        )
+
+        // Ícono para abrir la cámara
+        Image(
+            painter = painterResource(R.drawable.camera),
+            contentDescription = "Icono de la Cámara",
+            modifier = Modifier
+                .size(120.dp) // Tamaño del ícono
+                .padding(8.dp)
+                .clip(shape = RoundedCornerShape(30.dp))// Padding alrededor del ícono
+                .clickable { onCameraClick() } // Agrega comportamiento al hacer clic
         )
     }
 }

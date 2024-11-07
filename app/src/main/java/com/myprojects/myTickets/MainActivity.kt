@@ -16,7 +16,6 @@ import com.myprojects.myTickets.permissions.PermissionManager
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.CameraUtils
 import com.myprojects.myTickets.utils.GalleryUtils
-import com.myprojects.myTickets.utils.GeminiUtils
 import com.google.gson.Gson
 import com.myprojects.myTickets.data.Ticket
 import androidx.navigation.NavHostController
@@ -26,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.myprojects.myTickets.database.TicketDatabaseHelper
 import com.myprojects.myTickets.ticketView.ListTicketScreen
 import com.myprojects.myTickets.ticketView.TicketScreen
+import com.myprojects.myTickets.utils.GeminiUtils
 import com.myprojects.myTickets.utils.OpenAiUtils
 
 class MainActivity : ComponentActivity() {
@@ -155,7 +155,7 @@ class MainActivity : ComponentActivity() {
 
     // Procesar la imagen confirmada
     private fun processImage(imageUri: Uri?, navController: NavHostController) {
-        OpenAiUtils.processImageWithOpenAi(this, imageUri) { apiResponse ->
+        GeminiUtils.processImageWithGemini(this, imageUri) { apiResponse ->
             // Aquí recibes la respuesta de la API en apiResponse
             if (apiResponse.startsWith("Error")) {
                 // Manejar el error
