@@ -1,5 +1,6 @@
 package com.myprojects.myTickets
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -22,11 +23,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.JsonSyntaxException
 import com.myprojects.myTickets.database.TicketDatabaseHelper
 import com.myprojects.myTickets.ticketView.ListTicketScreen
 import com.myprojects.myTickets.ticketView.TicketScreen
+import com.myprojects.myTickets.utils.CsvUtils
 import com.myprojects.myTickets.utils.GeminiUtils
-import com.myprojects.myTickets.utils.OpenAiUtils
+
 
 class MainActivity : ComponentActivity() {
 
@@ -143,6 +146,10 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("editTicketScreen")}, // Navegar a la pantalla de edición
                             onHomeClick = {
                                 navController.navigate("home") // Navegar de vuelta a HomeScreen
+                            },
+                            onDownloadClick = {
+                                val tickets = dbHelper.getAllTickets()
+                                CsvUtils.exportTicketsToCSV(this@MainActivity, tickets)
                             }
                         )
                     }
@@ -163,8 +170,11 @@ class MainActivity : ComponentActivity() {
             } else {
                 Log.d("MainActivity", "Respuesta de la API: $apiResponse")
 
+
+                val formattedResponse = formatResponse(apiResponse)
+                Log.d("MainActivity", "Ticket parseado: $formattedResponse")
                 // Parsear el ticket
-                val ticket = parseTicketJson(apiResponse)
+                val ticket = parseTicketJson(formattedResponse)
 
                 // Actualizar el estado del ticket que será observado por Compose
                 ticketState.value = ticket
@@ -198,8 +208,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun formatResponse(response: String): String {
+        return response
+            .trim() // Elimina espacios en blanco y saltos de línea al inicio y final
+            .removePrefix("```json")
+            .removeSuffix("```")
+    }
+
+    private fun isValidJson(json: String): Boolean {
+        return try {
+            val gson = Gson()
+            gson.fromJson(json, Any::class.java)
+            true
+        } catch (e: JsonSyntaxException) {
+            false
+        }
+    }
+
     // Función para parsear el JSON del ticket
     private fun parseTicketJson(json: String): Ticket {
+        if (!isValidJson(json)) {
+            throw IllegalArgumentException("El formato del JSON no es válido")
+        }
+
         val gson = Gson()
         return gson.fromJson(json, Ticket::class.java)
     }

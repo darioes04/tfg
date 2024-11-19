@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,15 +21,19 @@ import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
 
 @Composable
-fun ListTicketScreen(tickets: List<Ticket>, onTicketClick: (Ticket) -> Unit, onHomeClick: () -> Unit) {
+fun ListTicketScreen(
+    tickets: List<Ticket>,
+    onTicketClick: (Ticket) -> Unit,
+    onHomeClick: () -> Unit,
+    onDownloadClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .padding(start = 20.dp),
-                verticalAlignment = Alignment.CenterVertically // Alinear los elementos verticalmente al centro
+                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                verticalAlignment = Alignment.CenterVertically // Alinear verticalmente los elementos al centro
             ) {
                 // Icono de casa para volver a HomeScreen
                 IconButton(
@@ -39,23 +44,36 @@ fun ListTicketScreen(tickets: List<Ticket>, onTicketClick: (Ticket) -> Unit, onH
                         contentDescription = "Volver a Home",
                         modifier = Modifier
                             .size(48.dp)
-
                     )
                 }
 
-                Spacer(modifier = Modifier.weight(1f)) // Añadir un Spacer para empujar el texto al centro
+                // Spacer para empujar el texto hacia el centro
+                Spacer(modifier = Modifier.weight(1f))
 
+                // Texto "Tickets" centrado
                 Text(
                     text = "Tickets",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(5f) // Ajustar el peso para centrar el texto
+                        .weight(3f) // Peso mayor para centrar el texto
                 )
 
-                Spacer(modifier = Modifier.weight(3f)) // Añadir un Spacer simétrico en el otro lado
+                // Spacer simétrico para balancear el peso
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Botón de descarga a la derecha
+                IconButton(
+                    onClick = { onDownloadClick() },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Descargar Tickets",
+                        modifier = Modifier
+                            .size(48.dp)
+                    )
+                }
             }
         }
         ,

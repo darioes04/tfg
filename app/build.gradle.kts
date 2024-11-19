@@ -70,8 +70,8 @@ dependencies {
     implementation(libs.gson.v288)
     implementation(libs.generativeai)
     implementation (libs.androidx.ui.text.google.fonts.v170)
-    implementation (libs.gson)  // Para guardar y leer JSON
-    implementation (libs.okhttp)  // Para hacer llamadas HTTP
+    implementation (libs.gson)  
+    implementation (libs.okhttp)
     implementation(libs.text.recognition)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx)

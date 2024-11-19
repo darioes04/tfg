@@ -7,31 +7,51 @@ import android.net.Uri
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.google.ai.client.generativeai.type.generationConfig
 import com.myprojects.myTickets.data.Constants
 import com.myprojects.prueba1.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.InputStream
 
 object GeminiUtils {
 
 
 
-    // Function to process the image with Gemini API
+    private fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
+        return try {
+            context.contentResolver.openInputStream(uri).use { stream ->
+                BitmapFactory.decodeStream(stream) // Carga el Bitmap directamente sin optimización
+            }
+        } catch (e: Exception) {
+            Log.e("uriToBitmap", "Error decoding stream: ${e.localizedMessage}")
+            null
+        }
+    }
+
+
+
+    // Function to process the image with Gemini API optimized for ticket data
     fun processImageWithGemini(context: Context, uri: Uri?, onResult: (String) -> Unit) {
         if (uri == null) {
             onResult("Error: URI es nula.")
             return
         }
 
+
+        val config = generationConfig {
+            temperature = 1f
+        }
+
         val generativeModel = GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.API_KEY // Reemplaza esto con tu clave API
+            apiKey = BuildConfig.API_KEY,
+            generationConfig = config
+
+
         )
+
 
         val prompt = Constants.Prompt
 
@@ -51,44 +71,20 @@ object GeminiUtils {
                     text(prompt)
                 }
 
-                // Llamada a la API para generar contenido
                 val res = generativeModel.generateContent(inputContent).text
-
-                // Loguear la respuesta para verificar qué devuelve la API
                 Log.d("GeminiUtils", "Respuesta de la API: $res")
 
-                // Verificar si la respuesta es un JSON o no
-                val responseContent = try {
-                    // Intentar convertir la respuesta en un objeto JSON
-                    val jsonResponse = res?.let { JSONObject(it) }
-                    jsonResponse.toString()  // Si es un JSON válido, devolverlo como cadena
-                } catch (e: JSONException) {
-                    // Si no es un JSON, es una cadena simple
-                    res ?: "Respuesta vacía de la API"
-                }
+                val responseContent = res ?: "Respuesta vacía de la API"
 
-                // Actualizar la UI o devolver el resultado
                 withContext(Dispatchers.Main) {
                     onResult(responseContent)
                 }
-
             } catch (e: Exception) {
                 Log.e("GeminiUtils", "Error generando contenido: ${e.message}")
                 withContext(Dispatchers.Main) {
                     onResult("Error: ${e.message}")
                 }
             }
-        }
-    }
-
-    // Function to convert URI to Bitmap
-    private fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
-        return try {
-            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-            BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
     }
 }
