@@ -1,7 +1,5 @@
 package com.myprojects.myTickets.data
 
-import com.google.android.gms.analytics.ecommerce.Product
-
 data class Ticket(
     val id: Long,
     val restaurante: String,

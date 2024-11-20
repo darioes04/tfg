@@ -1,15 +1,19 @@
 package com.myprojects.myTickets.permissions
 
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.provider.Settings
+
 
 object PermissionManager {
     private const val PERMISSION_REQUEST_CODE = 100
 
-    // Verifica si los permisos ya han sido otorgados
     fun checkAndRequestPermissions(activity: ComponentActivity): Boolean {
         val permissionsToRequest = mutableListOf<String>()
 
@@ -32,19 +36,33 @@ object PermissionManager {
         }
     }
 
-    // Maneja la respuesta de la solicitud de permisos
-    fun onRequestPermissionsResult(
+    // Maneja el resultado de la solicitud de permisos
+    fun handlePermissionsResult(
+        activity: ComponentActivity,
         requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        grantResults: IntArray
     ) {
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                onSuccess() // Todos los permisos fueron concedidos
-            } else {
-                onFailure() // Algún permiso fue denegado
+            // Si alguno de los permisos fue denegado
+            if (grantResults.any { it == PackageManager.PERMISSION_DENIED }) {
+                // Mostrar mensaje de cómo proceder
+                AlertDialog.Builder(activity)
+                    .setTitle("Permisos Requeridos")
+                    .setMessage(
+                        "Los permisos de cámara y almacenamiento son necesarios para continuar. " +
+                                "Por favor, habilítelos manualmente en Configuración > Aplicaciones > MyTickets > Permisos."
+                    )
+                    .setPositiveButton("Abrir Configuración") { _, _ ->
+                        // Abre la configuración de la aplicación
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", activity.packageName, null)
+                        }
+                        activity.startActivity(intent)
+                    }
+                    .setNegativeButton("Cancelar") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
         }
     }

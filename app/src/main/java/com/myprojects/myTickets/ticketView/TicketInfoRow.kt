@@ -1,5 +1,7 @@
 package com.myprojects.myTickets.ticketView
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -20,8 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (String) -> Unit) {
+
+
+
+
     var textFieldValue by remember { mutableStateOf(value) }
 
     Row(
@@ -62,6 +69,7 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
         )
     }
 }
+
 
 
 

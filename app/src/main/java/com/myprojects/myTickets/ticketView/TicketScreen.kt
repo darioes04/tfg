@@ -1,7 +1,10 @@
 package com.myprojects.myTickets.ticketView
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
@@ -24,7 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete: (Long) -> Unit) {
@@ -38,7 +45,6 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
     var totalConIva by remember { mutableStateOf(ticket.precioConIva) }
 
     Scaffold(
-        topBar = { /* Si necesitas un top bar, lo defines aquí */ },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -52,10 +58,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         .padding(16.dp)
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(16.dp)
-                            .background(MaterialTheme.colorScheme.background),
+                        modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item {
@@ -69,154 +72,112 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                             }
                         }
                         item {
+                            if(fecha == "DESCONOCIDA"){
+                                fecha = obtenerFechaActual()
+                            }
                             TicketInfoRow(label = "Fecha", value = fecha, "") { newValue ->
                                 fecha = newValue
                             }
                         }
                         item {
+                            if(hora == "DESCONOCIDA"){
+                                hora = obtenerHoraActual()
+                            }
                             TicketInfoRow(label = "Hora", value = hora, "") { newValue ->
                                 hora = newValue
                             }
                         }
 
+
+                        // Encabezados de la tabla
                         item {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = "Productos:",
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                TableHeader(text = "Producto", modifier = Modifier.weight(2f))
+                                TableHeader(text = "Precio Unidad", modifier = Modifier.weight(1f))
+                                TableHeader(text = "Cantidad", modifier = Modifier.weight(1f))
+                                TableHeader(text = "Precio Total", modifier = Modifier.weight(1f))
+                            }
                         }
 
+                        // Filas de productos
                         items(ticket.items.size) { index ->
                             val product = ticket.items[index]
-                            Column {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    BasicTextField(
-                                        value = product.item,
-                                        onValueChange = { newValue ->
-                                            val updatedProducts = ticket.items.toMutableList()
-                                            updatedProducts[index] = updatedProducts[index].copy(item = newValue)
-                                            ticket = ticket.copy(items = updatedProducts)
-                                        },
-                                        modifier = Modifier
-                                            .background(Color.Transparent),
-                                        textStyle = TextStyle(
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            fontSize = 16.sp
-                                        ),
-                                        singleLine = true
-                                    )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                EditableCell(
+                                    value = product.item,
+                                    modifier = Modifier.weight(2f)
+                                ) { newValue ->
+                                    val updatedProducts = ticket.items.toMutableList()
+                                    updatedProducts[index] = updatedProducts[index].copy(item = newValue)
+                                    ticket = ticket.copy(items = updatedProducts)
+                                }
+                                EditableCell(
+                                    value = product.precioUnidad,
+                                    modifier = Modifier.weight(1f)
+                                ) { newValue ->
+                                    val updatedProducts = ticket.items.toMutableList()
+                                    updatedProducts[index] = updatedProducts[index].copy(precioUnidad = newValue)
+                                    ticket = ticket.copy(items = updatedProducts)
                                 }
 
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Importe = ",
-                                        fontFamily = FontFamily.Serif,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
+                                EditableCell(
+                                    value = product.cantidad,
+                                    modifier = Modifier.weight(1f)
+                                ) { newValue ->
+                                    val updatedProducts = ticket.items.toMutableList()
+                                    updatedProducts[index] = updatedProducts[index].copy(cantidad = newValue)
+                                    ticket = ticket.copy(items = updatedProducts)
+                                }
 
-                                    var precioUnidad by remember { mutableStateOf(product.precioUnidad) }
-                                    BasicTextField(
-                                        value = precioUnidad,
-                                        onValueChange = { newValue ->
-                                            precioUnidad = newValue
-                                            val updatedProducts = ticket.items.toMutableList()
-                                            updatedProducts[index] = updatedProducts[index].copy(precioUnidad = newValue)
-                                            ticket = ticket.copy(items = updatedProducts)
-                                        },
-                                        textStyle = TextStyle(
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            fontSize = 16.sp
-                                        ),
-                                        modifier = Modifier.width(IntrinsicSize.Min)
-                                    )
-
-                                    Text(
-                                        text = " * ",
-                                        fontFamily = FontFamily.Serif,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-
-                                    var cantidad by remember { mutableStateOf(product.cantidad) }
-                                    BasicTextField(
-                                        value = cantidad,
-                                        onValueChange = { newValue ->
-                                            cantidad = newValue
-                                            val updatedProducts = ticket.items.toMutableList()
-                                            updatedProducts[index] = updatedProducts[index].copy(cantidad = newValue)
-                                            ticket = ticket.copy(items = updatedProducts)
-                                        },
-                                        textStyle = TextStyle(
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            fontSize = 16.sp
-                                        ),
-                                        modifier = Modifier.width(IntrinsicSize.Min)
-                                    )
-
-                                    Text(
-                                        text = " = ",
-                                        fontFamily = FontFamily.Serif,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-
-                                    var precioFinal by remember { mutableStateOf(product.precioFinal) }
-                                    BasicTextField(
-                                        value = precioFinal,
-                                        onValueChange = { newValue ->
-                                            precioFinal = newValue
-                                            val updatedProducts = ticket.items.toMutableList()
-                                            updatedProducts[index] = updatedProducts[index].copy(precioFinal = newValue)
-                                            ticket = ticket.copy(items = updatedProducts)
-                                        },
-                                        textStyle = TextStyle(
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            fontSize = 16.sp
-                                        ),
-                                        modifier = Modifier.width(IntrinsicSize.Min)
-                                    )
-
-                                    Text(
-                                        text = "€",
-                                        fontFamily = FontFamily.Serif,
-                                        fontWeight = FontWeight.Bold,
-                                    )
+                                EditableCell(
+                                    value = product.precioFinal,
+                                    modifier = Modifier.weight(1f)
+                                ) { newValue ->
+                                    val updatedProducts = ticket.items.toMutableList()
+                                    updatedProducts[index] = updatedProducts[index].copy(precioFinal = newValue)
+                                    ticket = ticket.copy(items = updatedProducts)
                                 }
                             }
                         }
-
                         item { Spacer(modifier = Modifier.height(16.dp)) }
 
+                        // Fila para Precio Sin IVA
                         item {
-                            TicketInfoRow(label = "Total sin IVA", value = ticket.precioSinIva, "€") { newValue ->
+                            TicketInfoRow(label = "Precio sin IVA", value = totalSinIva, "€") { newValue ->
                                 totalSinIva = newValue
+                                ticket = ticket.copy(precioSinIva = newValue)
                             }
                         }
 
+                        // Fila para IVA
                         item {
-                            TicketInfoRow(label = "IVA", value = ticket.iva, "%") { newValue ->
+                            TicketInfoRow(label = "IVA", value = iva, "%") { newValue ->
                                 iva = newValue
+                                ticket = ticket.copy(iva = newValue)
                             }
                         }
 
+                        // Fila para Precio Con IVA
                         item {
-                            TicketInfoRow(label = "Total con IVA", value = ticket.precioConIva, "€") { newValue ->
+                            TicketInfoRow(label = "Precio con IVA", value = totalConIva, "€") { newValue ->
                                 totalConIva = newValue
+                                ticket = ticket.copy(precioConIva = newValue)
                             }
                         }
                     }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -260,4 +221,49 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
             }
         }
     )
+}
+
+@Composable
+fun TableHeader(text: String, modifier: Modifier) {
+    Text(
+        text = text,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        modifier = modifier.padding(horizontal = 8.dp)
+    )
+}
+
+@Composable
+fun EditableCell(value: String, modifier: Modifier, onValueChange: (String) -> Unit) {
+    Box(
+        modifier = modifier
+            .border(1.dp, Color.Gray) // Añade un borde gris de 1dp
+            .padding(4.dp) // Espaciado interno dentro de la celda
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun obtenerHoraActual(): String {
+    val horaActual = LocalTime.now()
+    val formato = DateTimeFormatter.ofPattern("HH:mm")
+    return horaActual.format(formato)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun obtenerFechaActual(): String {
+    val fechaActual = LocalDate.now() // Obtiene la fecha actual
+    val formato = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return fechaActual.format(formato)
 }

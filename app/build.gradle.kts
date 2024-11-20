@@ -35,6 +35,7 @@ android {
         }
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -66,6 +67,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material.icons.extended)
     implementation (libs.androidx.navigation.compose)
     implementation(libs.gson.v288)
     implementation(libs.generativeai)

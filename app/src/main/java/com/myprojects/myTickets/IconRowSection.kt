@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,35 +24,46 @@ import com.myprojects.prueba1.R
 @Composable
 fun IconRowSection(onCameraClick: () -> Unit, onGalleryClick: () -> Unit) {
     Row(
-        verticalAlignment = Alignment.Bottom,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp)
     ) {
-
-        // Ícono para abrir la galería
-        Image(
-            painter = painterResource(R.drawable.galeria),
-            contentDescription = "Icono de la Galería",
+        // Card para la galería
+        Card(
             modifier = Modifier
-                .size(120.dp) // Tamaño del ícono
-                .padding(8.dp)
-                .clip(shape = RoundedCornerShape(40.dp))// Padding alrededor del ícono
-                .clickable { onGalleryClick() } // Agrega comportamiento al hacer clic
-        )
+                .size(140.dp) // Tamaño de la tarjeta
+                .clickable { onGalleryClick() }, // Acción al hacer clic
+            shape = RoundedCornerShape(20.dp), // Bordes redondeados
+            elevation = CardDefaults.cardElevation(8.dp) // Sombra de la tarjeta
+        ) {
+            Image(
+                painter = painterResource(R.drawable.galeria),
+                contentDescription = "Icono de la Galería",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .clip(shape = RoundedCornerShape(20.dp))
+            )
+        }
 
-        // Ícono para abrir la cámara
-        Image(
-            painter = painterResource(R.drawable.camera),
-            contentDescription = "Icono de la Cámara",
+        // Card para la cámara
+        Card(
             modifier = Modifier
-                .size(120.dp) // Tamaño del ícono
-                .padding(8.dp)
-                .clip(shape = RoundedCornerShape(30.dp))// Padding alrededor del ícono
-                .clickable { onCameraClick() } // Agrega comportamiento al hacer clic
-        )
+                .size(140.dp) // Tamaño de la tarjeta
+                .clickable { onCameraClick() }, // Acción al hacer clic
+            shape = RoundedCornerShape(20.dp), // Bordes redondeados
+            elevation = CardDefaults.cardElevation(8.dp) // Sombra de la tarjeta
+        ) {
+            Image(
+                painter = painterResource(R.drawable.camera),
+                contentDescription = "Icono de la Cámara",
+                modifier = Modifier
+                    .fillMaxSize() // La imagen llena la tarjeta
+                    .padding(16.dp)
+                    .clip(shape = RoundedCornerShape(20.dp))// Espaciado dentro de la tarjeta
+            )
+        }
     }
 }
-
-

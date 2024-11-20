@@ -1,16 +1,23 @@
 package com.myprojects.myTickets
 
-import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,15 +30,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-
 
 @Composable
 fun HomeScreen(
     onCameraClick: () -> Unit = {},
     onGalleryClick: () -> Unit = {},
-    selectedImageUri: Uri? = null,
-    onConfirmImage: () -> Unit = {},
     onNavigateToList: () -> Unit
 ) {
 
@@ -59,26 +62,6 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-
-
-                    selectedImageUri?.let { uri ->
-                        AsyncImage(
-                            model = uri,
-                            contentDescription = "Imagen seleccionada",
-                            modifier = Modifier
-                                .size(400.dp)
-                                .padding(16.dp)
-                        )
-
-
-                        Button(
-                            onClick = onConfirmImage,
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text("Confirmar imagen")
-                        }
-                    }
-
                     Spacer(modifier = Modifier.height(10.dp))
 
                     IconRowSection(onCameraClick = onCameraClick, onGalleryClick = onGalleryClick)
@@ -91,17 +74,44 @@ fun HomeScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = onNavigateToList,
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        Text("Tickets Guardados")
-                    }
+                    AccessSavedTicketsCard(onClick = onNavigateToList)
                 }
             }
         )
 
+}
+@Composable
+fun AccessSavedTicketsCard(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Receipt, // Ícono representativo
+                contentDescription = "Tickets Guardados",
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "Tickets",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

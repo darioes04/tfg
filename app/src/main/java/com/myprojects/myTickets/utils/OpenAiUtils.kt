@@ -37,7 +37,7 @@ object OpenAiUtils{
 
         // Definir el modelo y la clave de la API
         val apiKey = "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"
-        val prompt = Constants.Prompt
+        val prompt = Constants.PROMPT
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

@@ -12,7 +12,7 @@ import java.io.IOException
 object CsvUtils {
 
     fun exportTicketsToCSV(context: Context, tickets: List<Ticket>): Uri? {
-        val csvHeader = "Restaurante;CIF;Fecha;Hora;PrecioSinIVA;IVA;PrecioConIVA\n"
+        val csvHeader = "Restaurante;CIF;Fecha;Hora;Productos;PrecioSinIVA;IVA;PrecioConIVA\n"
         val fileName = "tickets.csv"
 
         // Directorio de almacenamiento
@@ -31,7 +31,7 @@ object CsvUtils {
                 // Agregar los datos de los tickets
                 for (ticket in tickets) {
                     val csvRow = "${ticket.restaurante};${ticket.cif};" +
-                            "${ticket.fecha};${ticket.hora};${ticket.precioSinIva};${ticket.iva};" +
+                            "${ticket.fecha};${ticket.hora};${ticket.items};${ticket.precioSinIva};${ticket.iva};" +
                             "${ticket.precioConIva}\n"
                     writer.append(csvRow)
                 }

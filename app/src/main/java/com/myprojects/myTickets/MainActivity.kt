@@ -1,8 +1,8 @@
 package com.myprojects.myTickets
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,10 +10,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.myprojects.myTickets.permissions.PermissionManager
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.CameraUtils
 import com.myprojects.myTickets.utils.GalleryUtils
@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.JsonSyntaxException
 import com.myprojects.myTickets.database.TicketDatabaseHelper
+import com.myprojects.myTickets.permissions.PermissionManager
 import com.myprojects.myTickets.ticketView.ListTicketScreen
 import com.myprojects.myTickets.ticketView.TicketScreen
 import com.myprojects.myTickets.utils.CsvUtils
@@ -43,14 +44,16 @@ class MainActivity : ComponentActivity() {
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
     private val ticketState = mutableStateOf<Ticket?>(null)
     private lateinit var dbHelper: TicketDatabaseHelper
+    private var onPictureCaptured: (() -> Unit)? = null
+    private var onImageSelected: (() -> Unit)? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Inicializar la base de datos
         dbHelper = TicketDatabaseHelper(this)
 
-        // Verifica y solicita permisos en tiempo de ejecución
         PermissionManager.checkAndRequestPermissions(this)
 
         // Inicializar los lanzadores aquí
@@ -58,8 +61,17 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyTicketsTheme {
+
                 // Configuración del NavController para la navegación
                 val navController = rememberNavController()
+
+                onPictureCaptured = {
+                    navController.navigate("confirmImageScreen")
+                }
+
+                onImageSelected = {
+                    navController.navigate("confirmImageScreen")
+                }
 
                 NavHost(
                     navController = navController,
@@ -74,15 +86,27 @@ class MainActivity : ComponentActivity() {
                             },
                             onGalleryClick = {
                                 GalleryUtils.selectImageFromGallery(this@MainActivity, galleryLauncher) { uri ->
-                                    selectedImageUri = uri
+                                    if (uri != null) {
+                                        selectedImageUri = uri
+                                    } else {
+                                        Log.d("Gallery", "No image selected")
+                                    }
                                 }
                             },
+                            onNavigateToList = {
+                                navController.navigate("listTicketScreen")
+                            }
+                        )
+                    }
+
+                    composable("confirmImageScreen") {
+                        ConfirmImageScreen(
                             selectedImageUri = selectedImageUri,
                             onConfirmImage = {
                                 processImage(selectedImageUri, navController)
                             },
-                            onNavigateToList = {
-                                navController.navigate("listTicketScreen")
+                            onCancelClick = {
+                                navController.navigate("home")
                             }
                         )
                     }
@@ -120,7 +144,7 @@ class MainActivity : ComponentActivity() {
                                     val success = dbHelper.updateTicket(updatedTicket)
                                     if (success) {
                                         Toast.makeText(this@MainActivity, "Ticket guardado correctamente", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("home")
+                                        navController.navigate("listTicketScreen")
                                     } else {
                                         Toast.makeText(this@MainActivity, "Error al guardar el ticket", Toast.LENGTH_SHORT).show()
                                     }
@@ -129,7 +153,7 @@ class MainActivity : ComponentActivity() {
                                     val success = dbHelper.deleteTicket(idTicket)
                                     if (success) {
                                         Toast.makeText(this@MainActivity, "Ticket eliminado correctamente", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("home")
+                                        navController.navigate("listTicketScreen")
                                     } else {
                                         Toast.makeText(this@MainActivity, "Error al eliminar el ticket", Toast.LENGTH_SHORT).show()
                                     }
@@ -158,6 +182,9 @@ class MainActivity : ComponentActivity() {
 
             }
         }
+
+
+
     }
 
     // Procesar la imagen confirmada
@@ -170,11 +197,7 @@ class MainActivity : ComponentActivity() {
             } else {
                 Log.d("MainActivity", "Respuesta de la API: $apiResponse")
 
-
-                val formattedResponse = formatResponse(apiResponse)
-                Log.d("MainActivity", "Ticket parseado: $formattedResponse")
-                // Parsear el ticket
-                val ticket = parseTicketJson(formattedResponse)
+                val ticket = parseTicketJson(apiResponse)
 
                 // Actualizar el estado del ticket que será observado por Compose
                 ticketState.value = ticket
@@ -189,9 +212,9 @@ class MainActivity : ComponentActivity() {
     private fun setupActivityResultLaunchers() {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                // Asegurarse de que la URI de la imagen capturada se actualiza
                 selectedImageUri = CameraUtils.photoUri
                 Toast.makeText(this, "Foto capturada", Toast.LENGTH_SHORT).show()
+                onPictureCaptured?.invoke()
             } else {
                 Toast.makeText(this, "Error al capturar la foto", Toast.LENGTH_SHORT).show()
             }
@@ -203,17 +226,14 @@ class MainActivity : ComponentActivity() {
                 imageUri?.let {
                     selectedImageUri = it
                     Toast.makeText(this, "Imagen seleccionada", Toast.LENGTH_SHORT).show()
+                    onImageSelected?.invoke()
                 }
+            } else {
+                Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun formatResponse(response: String): String {
-        return response
-            .trim() // Elimina espacios en blanco y saltos de línea al inicio y final
-            .removePrefix("```json")
-            .removeSuffix("```")
-    }
 
     private fun isValidJson(json: String): Boolean {
         return try {
