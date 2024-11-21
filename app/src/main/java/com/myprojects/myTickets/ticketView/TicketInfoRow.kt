@@ -1,7 +1,5 @@
 package com.myprojects.myTickets.ticketView
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -22,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (String) -> Unit) {
 
@@ -40,8 +37,7 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
         // Etiqueta
         Text(
             text = "$label: ",
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.alignByBaseline(),
             color = MaterialTheme.colorScheme.onBackground // Ajuste automático al modo oscuro/claro
         )

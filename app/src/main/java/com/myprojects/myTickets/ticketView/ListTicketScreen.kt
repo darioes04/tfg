@@ -6,8 +6,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CalendarViewDay
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,15 +27,52 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
 import androidx.compose.material.icons.filled.FileDownload
-
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.ui.res.painterResource
+import com.myprojects.prueba1.R
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun ListTicketScreen(
     tickets: List<Ticket>,
     onTicketClick: (Ticket) -> Unit,
     onHomeClick: () -> Unit,
-    onDownloadClick: () -> Unit
+    onDownloadClick: () -> Unit,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    var filteredTickets by remember { mutableStateOf(tickets) }
+    var selectedDate by remember { mutableStateOf("") }
+
+
+
+
+
+    // Filtrar los tickets dinámicamente al cambiar el texto de búsqueda
+    LaunchedEffect(searchQuery) {
+        filteredTickets = tickets.filter { ticket ->
+            ticket.restaurante.contains(searchQuery, ignoreCase = true) || // Buscar por restaurante
+                    ticket.fecha.contains(searchQuery, ignoreCase = true) || // Buscar por fecha
+                    ticket.precioConIva.contains(searchQuery, ignoreCase = true) || // Buscar por precio
+                    ticket.items.any { // Buscar por productos
+                        it.item.contains(
+                            searchQuery,
+                            ignoreCase = true
+                        )
+                    }
+        }
+    }
+
     Scaffold(
         topBar = {
             Row(
@@ -71,20 +110,39 @@ fun ListTicketScreen(
             }
         },
         content = { paddingValues ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                items(tickets) { ticket ->
-                    TicketCard(ticket = ticket, onClick = { onTicketClick(ticket) })
+                SearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChanged = { query -> searchQuery = query }
+                )
+
+                CalendarButton(onDateSelected = { date ->
+                    selectedDate = date
+                    searchQuery = date // Actualiza la barra de búsqueda con la fecha seleccionada si quieres
+                })
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Lista de tickets filtrados
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(filteredTickets) { ticket ->
+                        TicketCard(ticket = ticket, onClick = { onTicketClick(ticket) })
+                    }
                 }
             }
         }
     )
 }
+
 
 @Composable
 fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
@@ -109,7 +167,9 @@ fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Filled.CalendarToday,
@@ -131,6 +191,94 @@ fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit
+) {
+    TextField(
+        value = searchQuery,
+        onValueChange = onSearchQueryChanged,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        placeholder = { Text("Buscar por restaurante, comida, precio...") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = "Buscar"
+            )
+        },
+        singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = MaterialTheme.colorScheme.surface, // Fija el fondo del campo de texto
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Color de la línea al enfocarse
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) // Color de la línea sin enfoque
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CalendarButton(onDateSelected: (String) -> Unit) {
+    val state = rememberDatePickerState()
+    var showDialog by remember { mutableStateOf(false) }
+
+
+    Button(
+        onClick = { showDialog = true },
+    ) {
+        Row {
+            Icon(
+                imageVector = Icons.Filled.CalendarMonth,
+                contentDescription = "Fecha",
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text("Seleccionar Fecha")
+        }
+    }
+
+    if (showDialog) {
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                Button(onClick = {
+                    showDialog = false
+                    val date = state.selectedDateMillis
+                    date?.let {
+                        val formattedDate = Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+
+                        // Formatea manualmente asegurando dos dígitos
+                        val day = formattedDate.dayOfMonth.toString().padStart(2, '0')
+                        val month = formattedDate.monthValue.toString().padStart(2, '0')
+                        val year = formattedDate.year.toString()
+
+                        val localDate = "$day/$month/$year"
+                        onDateSelected(localDate)
+                    }
+
+                }) {
+                    Text(text = "Confirmar")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showDialog = false }) {
+                    Text(text = "Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = state)
         }
     }
 }

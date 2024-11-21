@@ -18,9 +18,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -147,35 +149,24 @@ fun ConfirmImageScreen(
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                tonalElevation = 4.dp
+                tonalElevation = 25.dp
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly // Espacio uniforme entre botones
                 ) {
-                    Button(
+                    OutlinedButton(
                         onClick = { onCancelClick() },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error, // Cambia a un tono más oscuro
-                            contentColor = MaterialTheme.colorScheme.onError // Ajusta el color del texto
-                        ),
-                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text("Cancelar")
                     }
 
-
-
-                    Button(
+                    TextButton(
                         onClick = { onConfirmImage() },
+                        // Igual peso que el botón de cancelar
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        shape = RoundedCornerShape(8.dp)
+                        )
                     ) {
                         Text("Confirmar")
                     }

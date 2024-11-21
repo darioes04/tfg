@@ -7,6 +7,7 @@ plugins {
 
 
 
+
 android {
     namespace = "com.myprojects.prueba1"
     compileSdk = 34
@@ -16,13 +17,14 @@ android {
     }
 
 
+
     defaultConfig {
         val properties = Properties()
         properties.load(project.rootProject.file("api.properties").inputStream())
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
 
         applicationId = "com.myprojects.myTickets"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -66,7 +68,9 @@ android {
     }
 }
 
+
 dependencies {
+    implementation (libs.material)
     implementation(libs.androidx.material.icons.extended)
     implementation (libs.androidx.navigation.compose)
     implementation(libs.gson.v288)

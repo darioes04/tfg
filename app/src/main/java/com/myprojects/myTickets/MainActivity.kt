@@ -32,7 +32,7 @@ import com.myprojects.myTickets.utils.CsvUtils
 import com.myprojects.myTickets.utils.GeminiUtils
 
 
-class MainActivity : ComponentActivity() {
+    class MainActivity : ComponentActivity() {
 
 
     private var selectedImageUri by mutableStateOf<Uri?>(null)
