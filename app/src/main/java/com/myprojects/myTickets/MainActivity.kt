@@ -2,15 +2,14 @@ package com.myprojects.myTickets
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import android.window.OnBackInvokedCallback
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -32,22 +31,27 @@ import com.myprojects.myTickets.utils.CsvUtils
 import com.myprojects.myTickets.utils.GeminiUtils
 
 
-    class MainActivity : ComponentActivity() {
-
-
+class MainActivity : ComponentActivity() {
     private var selectedImageUri by mutableStateOf<Uri?>(null)
+
+
 
 
 
     // Declarar los lanzadores
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
+
     private val ticketState = mutableStateOf<Ticket?>(null)
     private lateinit var dbHelper: TicketDatabaseHelper
+
     private var onPictureCaptured: (() -> Unit)? = null
     private var onImageSelected: (() -> Unit)? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    private var isLoading by mutableStateOf( false) // para determinar si mostrar la animación de carga o no
+    private var isCancelled by mutableStateOf(false) // para cancelar procesamiento de imagen en caso de pulsar el botón de back
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,9 +107,21 @@ import com.myprojects.myTickets.utils.GeminiUtils
                         ConfirmImageScreen(
                             selectedImageUri = selectedImageUri,
                             onConfirmImage = {
+                                isLoading = true
+                                isCancelled = false
                                 processImage(selectedImageUri, navController)
+
                             },
                             onCancelClick = {
+                                isLoading = false
+                                isCancelled = true
+                                navController.navigate("home")
+                            },
+                            isLoading = isLoading,
+
+                            onBackPressed = {
+                                isLoading = false
+                                isCancelled = true
                                 navController.navigate("home")
                             }
                         )
@@ -190,20 +206,29 @@ import com.myprojects.myTickets.utils.GeminiUtils
     // Procesar la imagen confirmada
     private fun processImage(imageUri: Uri?, navController: NavHostController) {
         GeminiUtils.processImageWithGemini(this, imageUri) { apiResponse ->
-            // Aquí recibes la respuesta de la API en apiResponse
+            // Detener el procesamiento si fue cancelado
+            if (isCancelled) {
+                Log.d("MainActivity", "El procesamiento fue cancelado.")
+                isLoading = false
+                return@processImageWithGemini
+            }
+
             if (apiResponse.startsWith("Error")) {
-                // Manejar el error
                 Toast.makeText(this, apiResponse, Toast.LENGTH_SHORT).show()
             } else {
                 Log.d("MainActivity", "Respuesta de la API: $apiResponse")
 
                 val ticket = parseTicketJson(apiResponse)
 
-                // Actualizar el estado del ticket que será observado por Compose
+                // Actualizar el estado del ticket si no fue cancelado
                 ticketState.value = ticket
 
-                // Navegar a la nueva pantalla ticketScreen
-                navController.navigate("ticketScreen")
+                isLoading = false
+
+                // Navegar a la nueva pantalla solo si no está cancelado
+                if (!isCancelled) {
+                    navController.navigate("ticketScreen")
+                }
             }
         }
     }
@@ -235,6 +260,9 @@ import com.myprojects.myTickets.utils.GeminiUtils
     }
 
 
+
+
+
     private fun isValidJson(json: String): Boolean {
         return try {
             val gson = Gson()
@@ -254,4 +282,9 @@ import com.myprojects.myTickets.utils.GeminiUtils
         val gson = Gson()
         return gson.fromJson(json, Ticket::class.java)
     }
+
+
+
+
 }
+

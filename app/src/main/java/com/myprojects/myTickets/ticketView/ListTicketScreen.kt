@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.CalendarViewDay
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,8 +37,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.*
-import androidx.compose.ui.res.painterResource
-import com.myprojects.prueba1.R
 import java.time.Instant
 import java.time.ZoneId
 
@@ -115,6 +112,7 @@ fun ListTicketScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
+
             ) {
                 SearchBar(
                     searchQuery = searchQuery,
@@ -206,7 +204,7 @@ fun SearchBar(
         onValueChange = onSearchQueryChanged,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(5.dp),
         placeholder = { Text("Buscar por restaurante, comida, precio...") },
         leadingIcon = {
             Icon(

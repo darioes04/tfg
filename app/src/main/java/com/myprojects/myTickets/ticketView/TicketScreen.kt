@@ -1,8 +1,6 @@
 package com.myprojects.myTickets.ticketView
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -11,7 +9,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +27,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete: (Long) -> Unit) {
@@ -252,16 +247,12 @@ fun EditableCell(value: String, modifier: Modifier, onValueChange: (String) -> U
     }
 }
 
-
-
-@RequiresApi(Build.VERSION_CODES.O)
 fun obtenerHoraActual(): String {
     val horaActual = LocalTime.now()
     val formato = DateTimeFormatter.ofPattern("HH:mm")
     return horaActual.format(formato)
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun obtenerFechaActual(): String {
     val fechaActual = LocalDate.now() // Obtiene la fecha actual
     val formato = DateTimeFormatter.ofPattern("dd/MM/yyyy")
