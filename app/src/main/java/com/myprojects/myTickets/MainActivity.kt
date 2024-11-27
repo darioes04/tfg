@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import android.window.OnBackInvokedCallback
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -36,8 +35,6 @@ class MainActivity : ComponentActivity() {
 
 
 
-
-
     // Declarar los lanzadores
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
@@ -50,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     private var isLoading by mutableStateOf( false) // para determinar si mostrar la animación de carga o no
     private var isCancelled by mutableStateOf(false) // para cancelar procesamiento de imagen en caso de pulsar el botón de back
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,27 +178,23 @@ class MainActivity : ComponentActivity() {
 
                     composable("listTicketScreen") {
                         ListTicketScreen(
-                            tickets = dbHelper.getAllTickets(), // Recuerda definir esta función
+                            tickets = dbHelper.getAllTickets(),
                             onTicketClick = { ticket ->
-                                ticketState.value = ticket // Guardar el ticket seleccionado
-                                navController.navigate("editTicketScreen")}, // Navegar a la pantalla de edición
-                            onHomeClick = {
-                                navController.navigate("home") // Navegar de vuelta a HomeScreen
+                                ticketState.value = ticket
+                                navController.navigate("editTicketScreen")
                             },
-                            onDownloadClick = {
-                                val tickets = dbHelper.getAllTickets()
-                                CsvUtils.exportTicketsToCSV(this@MainActivity, tickets)
+                            onHomeClick = {
+                                navController.navigate("home")
+                            },
+                            onDownloadClick = { filteredTickets ->
+                                CsvUtils.exportTicketsToCSV(context = this@MainActivity, tickets = filteredTickets)
                             }
                         )
                     }
-
                 }
 
             }
         }
-
-
-
     }
 
     // Procesar la imagen confirmada
@@ -259,10 +253,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
-
-
     private fun isValidJson(json: String): Boolean {
         return try {
             val gson = Gson()
@@ -282,9 +272,5 @@ class MainActivity : ComponentActivity() {
         val gson = Gson()
         return gson.fromJson(json, Ticket::class.java)
     }
-
-
-
-
 }
 

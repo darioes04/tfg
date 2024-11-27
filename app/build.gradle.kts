@@ -24,7 +24,7 @@ android {
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
 
         applicationId = "com.myprojects.myTickets"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

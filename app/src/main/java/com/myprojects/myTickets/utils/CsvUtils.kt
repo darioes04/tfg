@@ -1,13 +1,11 @@
 package com.myprojects.myTickets.utils
 
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import com.myprojects.myTickets.data.Ticket
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
 
 object CsvUtils {
 
@@ -15,42 +13,43 @@ object CsvUtils {
         val csvHeader = "Restaurante;CIF;Fecha;Hora;Productos;PrecioSinIVA;IVA;PrecioConIVA\n"
         val fileName = "tickets.csv"
 
-        // Directorio de almacenamiento
-        val storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        if (storageDir == null) {
-            Toast.makeText(context, "Error: No se puede acceder al almacenamiento.", Toast.LENGTH_SHORT).show()
-            return null
+        // Configuración de MediaStore para almacenar el archivo en la carpeta "Descargas"
+        val resolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, fileName) // Nombre del archivo
+            put(MediaStore.Downloads.MIME_TYPE, "text/csv") // Tipo MIME
+            put(MediaStore.Downloads.RELATIVE_PATH, "Download/") // Carpeta "Descargas"
         }
 
-        val csvFile = File(storageDir, fileName)
+        // Crear el archivo usando MediaStore
+        val uri: Uri? = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
 
-        try {
-            FileWriter(csvFile).use { writer ->
-                writer.append(csvHeader)
+        return if (uri != null) {
+            try {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    // Escribir encabezado
+                    outputStream.write(csvHeader.toByteArray())
 
-                // Agregar los datos de los tickets
-                for (ticket in tickets) {
-                    val csvRow = "${ticket.restaurante};${ticket.cif};" +
-                            "${ticket.fecha};${ticket.hora};${ticket.items};${ticket.precioSinIva};${ticket.iva};" +
-                            "${ticket.precioConIva}\n"
-                    writer.append(csvRow)
+                    // Escribir datos de los tickets
+                    for (ticket in tickets) {
+                        val csvRow = "${ticket.restaurante};${ticket.cif};" +
+                                "${ticket.fecha};${ticket.hora};${ticket.items};${ticket.precioSinIva};${ticket.iva};" +
+                                "${ticket.precioConIva}\n"
+                        outputStream.write(csvRow.toByteArray())
+                    }
                 }
 
-                writer.flush()
+                // Mostrar mensaje de éxito
+                Toast.makeText(context, "Archivo CSV generado en la carpeta Descargas", Toast.LENGTH_SHORT).show()
+                uri
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "Error al generar el archivo .csv: ${e.message}", Toast.LENGTH_SHORT).show()
+                null
             }
-
-            // Mostrar mensaje de éxito
-            Toast.makeText(context, "Archivo CSV generado en la carpeta de Descargas", Toast.LENGTH_SHORT).show()
-
-            // Devuelve la URI del archivo para compartir (opcional)
-            return Uri.fromFile(csvFile)
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(context, "Error al generar el archivo CSV.", Toast.LENGTH_SHORT).show()
-            return null
+        } else {
+            Toast.makeText(context, "No se pudo crear el archivo .csv.", Toast.LENGTH_SHORT).show()
+            null
         }
     }
-
-
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import android.net.Uri
-import android.window.OnBackInvokedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -150,7 +149,7 @@ fun ConfirmImageScreen(
                     ) {
                         Text(
                             text = "Por favor, confirma si esta es la imagen correcta",
-                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 16.dp)

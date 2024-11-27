@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,8 +46,9 @@ fun ListTicketScreen(
     tickets: List<Ticket>,
     onTicketClick: (Ticket) -> Unit,
     onHomeClick: () -> Unit,
-    onDownloadClick: () -> Unit,
+    onDownloadClick: (List<Ticket>) -> Unit
 ) {
+    var showDialog by remember { mutableStateOf(false) } // Manage dialog visibility
     var searchQuery by remember { mutableStateOf("") }
     var filteredTickets by remember { mutableStateOf(tickets) }
     var selectedDate by remember { mutableStateOf("") }
@@ -97,9 +99,9 @@ fun ListTicketScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = { onDownloadClick() }) {
+                IconButton(onClick = { showDialog = true }) {
                     Icon(
-                        imageVector = Icons.Filled.FileDownload,
+                        imageVector = Icons.Filled.SaveAlt,
                         contentDescription = "Descargar Tickets",
                         modifier = Modifier.size(32.dp)
                     )
@@ -139,6 +141,27 @@ fun ListTicketScreen(
             }
         }
     )
+    // Show the dialog if needed
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Export Tickets") },
+            text = { Text(text = "¿Estás seguro de que deseas exportar los tickets a un archivo .csv?") },
+            confirmButton = {
+                Button(onClick = {
+                    onDownloadClick(filteredTickets)
+                    showDialog = false // Close dialog
+                }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 }
 
 

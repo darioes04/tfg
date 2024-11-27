@@ -9,6 +9,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -180,37 +182,63 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = {
-                                val updatedTicket = ticket.copy(
-                                    restaurante = restaurante,
-                                    cif = cif,
-                                    fecha = fecha,
-                                    hora = hora,
-                                    precioSinIva = totalSinIva,
-                                    precioConIva = totalConIva,
-                                    iva = iva
-                                )
-                                onConfirmClick(updatedTicket)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = "Confirmar Cambios",
-                                modifier = Modifier
-                                    .size(48.dp)
 
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            IconButton(
+                                onClick = { onClickDelete(ticket.id) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Eliminar Ticket",
+                                    modifier = Modifier
+                                        .size(48.dp)
+
+                                )
+                            }
+                            Text(
+                                text = "Eliminar",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        IconButton(
-                            onClick = { onClickDelete(ticket.id) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Eliminar Ticket",
-                                modifier = Modifier.size(48.dp)
+
+
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            IconButton(
+                                onClick = {
+                                    val updatedTicket = ticket.copy(
+                                        restaurante = restaurante,
+                                        cif = cif,
+                                        fecha = fecha,
+                                        hora = hora,
+                                        precioSinIva = totalSinIva,
+                                        precioConIva = totalConIva,
+                                        iva = iva
+                                    )
+                                    onConfirmClick(updatedTicket)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Save,
+                                    contentDescription = "Confirmar Cambios",
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+                            Text(
+                                text = "Guardar",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
+
                     }
                 }
             }
