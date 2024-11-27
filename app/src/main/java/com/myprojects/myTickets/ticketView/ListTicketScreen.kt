@@ -50,12 +50,8 @@ fun ListTicketScreen(
 ) {
     var showDialog by remember { mutableStateOf(false) } // Manage dialog visibility
     var searchQuery by remember { mutableStateOf("") }
-    var filteredTickets by remember { mutableStateOf(tickets) }
     var selectedDate by remember { mutableStateOf("") }
-
-
-
-
+    var filteredTickets by remember { mutableStateOf(tickets) }
 
     // Filtrar los tickets dinámicamente al cambiar el texto de búsqueda
     LaunchedEffect(searchQuery) {

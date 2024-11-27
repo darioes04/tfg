@@ -1,7 +1,9 @@
 package com.myprojects.myTickets.ticketView
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,27 +44,35 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
             color = MaterialTheme.colorScheme.onBackground // Ajuste automático al modo oscuro/claro
         )
 
-        // TextField sin contorno
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-                onValueChange(it)
-            },
+        Box(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
+                .border(1.dp, Color.Gray)
                 .background(Color.Transparent)
-                .width(IntrinsicSize.Min),
-            textStyle = TextStyle(
-                color = MaterialTheme.colorScheme.onBackground, // Ajuste de color automático
-                fontSize = 16.sp
-            ),
-        )
+                .width(IntrinsicSize.Min)
+        ) {
+            BasicTextField(
+                value = textFieldValue,
+                onValueChange = {
+                    textFieldValue = it
+                    onValueChange(it)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp
+                ),
+            )
+        }
+
         Text(
             text = symbol,
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
         )
+
     }
 }
 

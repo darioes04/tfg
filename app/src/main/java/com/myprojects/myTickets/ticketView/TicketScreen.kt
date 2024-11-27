@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -96,9 +94,9 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 TableHeader(text = "Producto", modifier = Modifier.weight(2f))
-                                TableHeader(text = "Precio Unidad", modifier = Modifier.weight(1f))
+                                TableHeader(text = "Precio Unidad (€)", modifier = Modifier.weight(1f))
                                 TableHeader(text = "Cantidad", modifier = Modifier.weight(1f))
-                                TableHeader(text = "Precio Total", modifier = Modifier.weight(1f))
+                                TableHeader(text = "Precio Total (€)", modifier = Modifier.weight(1f))
                             }
                         }
 

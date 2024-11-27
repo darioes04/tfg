@@ -6,11 +6,12 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import com.myprojects.myTickets.data.Ticket
+import java.util.Locale
 
 object CsvUtils {
 
     fun exportTicketsToCSV(context: Context, tickets: List<Ticket>): Uri? {
-        val csvHeader = "Restaurante;CIF;Fecha;Hora;Productos;PrecioSinIVA;IVA;PrecioConIVA\n"
+        val csvHeader = "Restaurante;CIF;Fecha;Hora;Productos;PrecioSinIVA(€);IVA(%);PrecioConIVA(€)\n"
         val fileName = "tickets.csv"
 
         // Configuración de MediaStore para almacenar el archivo en la carpeta "Descargas"
@@ -30,13 +31,18 @@ object CsvUtils {
                     // Escribir encabezado
                     outputStream.write(csvHeader.toByteArray())
 
+                    var total = 0.00
                     // Escribir datos de los tickets
                     for (ticket in tickets) {
+                        total += ticket.precioConIva.toDouble()
                         val csvRow = "${ticket.restaurante};${ticket.cif};" +
                                 "${ticket.fecha};${ticket.hora};${ticket.items};${ticket.precioSinIva};${ticket.iva};" +
                                 "${ticket.precioConIva}\n"
                         outputStream.write(csvRow.toByteArray())
                     }
+                    val totalFormatted = String.format(Locale.US, "%.2f", total)
+                    val csvRow = ";;;;;;;$totalFormatted"
+                    outputStream.write(csvRow.toByteArray())
                 }
 
                 // Mostrar mensaje de éxito
