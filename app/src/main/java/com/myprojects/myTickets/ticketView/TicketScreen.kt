@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
@@ -111,6 +113,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 EditableCell(
+                                    label = "Producto",
                                     value = product.item,
                                     modifier = Modifier.weight(2f)
                                 ) { newValue ->
@@ -119,6 +122,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                     ticket = ticket.copy(items = updatedProducts)
                                 }
                                 EditableCell(
+                                    label = "Precio Unidad (€)",
                                     value = product.precioUnidad,
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
@@ -128,6 +132,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 }
 
                                 EditableCell(
+                                    label = "Cantidad",
                                     value = product.cantidad,
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
@@ -137,6 +142,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 }
 
                                 EditableCell(
+                                    label = "Precio Total (€)",
                                     value = product.precioFinal,
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
@@ -255,7 +261,7 @@ fun TableHeader(text: String, modifier: Modifier) {
 }
 
 @Composable
-fun EditableCell(value: String, modifier: Modifier, onValueChange: (String) -> Unit) {
+fun EditableCell(label: String, value: String, modifier: Modifier, onValueChange: (String) -> Unit) {
     Box(
         modifier = modifier
             .border(1.dp, Color.Gray) // Añade un borde gris de 1dp
@@ -263,12 +269,23 @@ fun EditableCell(value: String, modifier: Modifier, onValueChange: (String) -> U
     ) {
         BasicTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                // Filtra la coma `,` para evitar que el usuario la escriba
+                val sanitizedValue = newValue.replace(",", "")
+                onValueChange(sanitizedValue) // Notifica el cambio al controlador de estado
+            },
             textStyle = TextStyle(
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = if (label == "Precio Unidad (€)" || label == "Cantidad"|| label == "Precio Total (€)"){
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number // Usa el teclado numérico
+                )
+            } else {
+                KeyboardOptions.Default // Usa el teclado por defecto
+            },
         )
     }
 }

@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myprojects.myTickets.data.Ticket
-import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -38,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.*
+import androidx.compose.ui.unit.LayoutDirection
 import java.time.Instant
 import java.time.ZoneId
 
@@ -108,9 +108,13 @@ fun ListTicketScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-
+                    .padding(
+                        top = paddingValues.calculateTopPadding() -20.dp,
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = paddingValues.calculateBottomPadding()
+                    )
+                    .padding(horizontal = 10.dp) // Padding adicional
             ) {
                 SearchBar(
                     searchQuery = searchQuery,
@@ -224,7 +228,7 @@ fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
-        placeholder = { Text("Buscar por restaurante, comida, precio...") },
+        placeholder = { Text("Buscar restaurante, comida, precio...") },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,
