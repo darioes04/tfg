@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "176526415540",
+    "project_id": "mytickets-c733d",
+    "storage_bucket": "mytickets-c733d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176526415540:android:d61a054989cc743fd4e9e1",
+        "android_client_info": {
+          "package_name": "com.myprojects.myTickets"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "176526415540-qca9j0bedre3omlos78d9upe06lpdho8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myprojects.myTickets",
+            "certificate_hash": "bd150692d5d875bd5ddf636075a5ee8d1a066e25"
+          }
+        },
+        {
+          "client_id": "176526415540-eucu8kvi6bnikflp408ie0ulia0clp4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWvPL6cjfndIF9iScGklZCsSoi-9jXVXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "176526415540-eucu8kvi6bnikflp408ie0ulia0clp4h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

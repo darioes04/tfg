@@ -1,5 +1,6 @@
 package com.myprojects.myTickets.database
 
+/*
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -140,7 +141,6 @@ class TicketDatabaseHelper(context: Context) :
 
                 // Crear el objeto Ticket y añadirlo a la lista
                 val ticket = Ticket(
-                    id = ticketId,
                     restaurante = restaurante,
                     cif = cif,
                     fecha = fecha,
@@ -227,3 +227,4 @@ class TicketDatabaseHelper(context: Context) :
 
 
 }
+*/

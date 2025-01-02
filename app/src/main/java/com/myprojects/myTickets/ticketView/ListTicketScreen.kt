@@ -1,5 +1,6 @@
 package com.myprojects.myTickets.ticketView
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,34 +38,39 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.*
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.unit.LayoutDirection
+import com.myprojects.myTickets.database.FireBaseHelper
 import java.time.Instant
 import java.time.ZoneId
 
 @Composable
 fun ListTicketScreen(
-    tickets: List<Ticket>,
+    firebaseHelper: FireBaseHelper,
     onTicketClick: (Ticket) -> Unit,
     onHomeClick: () -> Unit,
     onDownloadClick: (List<Ticket>) -> Unit
 ) {
+    val tickets by produceState<List<Ticket>>(initialValue = emptyList()) {
+        try {
+            value = firebaseHelper.getTickets()
+        } catch (e: Exception) {
+            Log.e("ListTicketScreen", "Error al cargar tickets: ${e.message}")
+        }
+    }
+
     var showDialog by remember { mutableStateOf(false) } // Manage dialog visibility
     var searchQuery by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf("") }
     var filteredTickets by remember { mutableStateOf(tickets) }
 
     // Filtrar los tickets dinámicamente al cambiar el texto de búsqueda
-    LaunchedEffect(searchQuery) {
+    LaunchedEffect(searchQuery, tickets) {
         filteredTickets = tickets.filter { ticket ->
-            ticket.restaurante.contains(searchQuery, ignoreCase = true) || // Buscar por restaurante
-                    ticket.fecha.contains(searchQuery, ignoreCase = true) || // Buscar por fecha
-                    ticket.precioConIva.contains(searchQuery, ignoreCase = true) || // Buscar por precio
-                    ticket.items.any { // Buscar por productos
-                        it.item.contains(
-                            searchQuery,
-                            ignoreCase = true
-                        )
-                    }
+            ticket.restaurante.contains(searchQuery, ignoreCase = true) ||
+                    ticket.fecha.contains(searchQuery, ignoreCase = true) ||
+                    ticket.precioConIva.contains(searchQuery, ignoreCase = true) ||
+                    ticket.items.any { it.item.contains(searchQuery, ignoreCase = true) }
         }
     }
 
@@ -228,7 +234,7 @@ fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
-        placeholder = { Text("Buscar restaurante, comida, precio...") },
+        placeholder = { Text("Buscar restaurante, comida...") },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,

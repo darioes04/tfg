@@ -1,7 +1,7 @@
 package com.myprojects.myTickets.data
 
 data class Ticket(
-    val id: Long,
+    val id: String = "",
     val restaurante: String,
     val cif: String,
     val fecha: String,

@@ -10,11 +10,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +31,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete: (Long) -> Unit) {
+fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete: (String) -> Unit) {
     var ticket by remember { mutableStateOf(ticket) }
+    var id by remember { mutableStateOf(ticket.id) } // Usa el ID real
     var restaurante by remember { mutableStateOf(ticket.restaurante) }
     var cif by remember { mutableStateOf(ticket.cif) }
     var fecha by remember { mutableStateOf(ticket.fecha) }
@@ -40,6 +44,11 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
     var totalSinIva by remember { mutableStateOf(ticket.precioSinIva) }
     var iva by remember { mutableStateOf(ticket.iva) }
     var totalConIva by remember { mutableStateOf(ticket.precioConIva) }
+
+    if(id == null){
+        id = ""
+    }
+
 
     Scaffold(
         content = { paddingValues ->
@@ -218,6 +227,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                             IconButton(
                                 onClick = {
                                     val updatedTicket = ticket.copy(
+                                        id = id,
                                         restaurante = restaurante,
                                         cif = cif,
                                         fecha = fecha,
