@@ -29,7 +29,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -176,18 +175,22 @@ fun ConfirmImageScreen(
                     ) {
                         OutlinedButton(
                             onClick = { onCancelClick() },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary // Color primario
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                         ) {
-                            Text("Cancelar")
+                            Text("No")
                         }
 
-                        TextButton(
+                        OutlinedButton(
                             onClick = { onConfirmImage() },
-                            // Igual peso que el botón de cancelar
-                            colors = ButtonDefaults.buttonColors(
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary // Color primario
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                         ) {
-                            Text("Confirmar")
+                            Text("Sí")
                         }
                     }
                 }

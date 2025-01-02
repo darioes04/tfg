@@ -11,12 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,10 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
     var totalSinIva by remember { mutableStateOf(ticket.precioSinIva) }
     var iva by remember { mutableStateOf(ticket.iva) }
     var totalConIva by remember { mutableStateOf(ticket.precioConIva) }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSaveDialog by remember { mutableStateOf(false) }
+
 
     if(id == null){
         id = ""
@@ -201,7 +206,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                             horizontalAlignment = Alignment.CenterHorizontally
                         ){
                             IconButton(
-                                onClick = { onClickDelete(ticket.id) }
+                                onClick = { showDeleteDialog = true }
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
@@ -226,17 +231,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         ){
                             IconButton(
                                 onClick = {
-                                    val updatedTicket = ticket.copy(
-                                        id = id,
-                                        restaurante = restaurante,
-                                        cif = cif,
-                                        fecha = fecha,
-                                        hora = hora,
-                                        precioSinIva = totalSinIva,
-                                        precioConIva = totalConIva,
-                                        iva = iva
-                                    )
-                                    onConfirmClick(updatedTicket)
+                                    showSaveDialog = true
                                 }
                             ) {
                                 Icon(
@@ -258,6 +253,135 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
             }
         }
     )
+    // Diálogo de Confirmación para Eliminar Ticket
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false // Cierra el diálogo
+            },
+            confirmButton = {
+                OutlinedButton( // Botón con contorno
+                    onClick = {
+                        showDeleteDialog = false
+                        onClickDelete(ticket.id ?: "") // Elimina el ticket
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                OutlinedButton( // Botón con contorno
+                    onClick = {
+                        showDeleteDialog = false // Cancela la acción
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
+                ) {
+                    Text("No")
+
+                }
+            },
+            title = {
+                Text(
+                    text = "Eliminar Ticket",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onSurface // Color coherente
+                )
+            },
+            text = {
+                if(ticket.id == null){
+                    Text(
+                        text = "¿Estás seguro de que deseas cancelar este ticket?",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface // Color coherente
+                    )
+                }
+                else{
+                    Text(
+                        text = "¿Estás seguro de que deseas eliminar este ticket?",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface // Color coherente
+                    )
+                }
+
+            },
+            containerColor = MaterialTheme.colorScheme.surface, // Fondo del diálogo
+            tonalElevation = 8.dp, // Elevación para sombra
+            shape = MaterialTheme.shapes.medium // Bordes redondeados
+        )
+    }
+
+    // Diálogo de Confirmación para Guardar Ticket
+    if (showSaveDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showSaveDialog = false // Cierra el diálogo
+            },
+            confirmButton = {
+                OutlinedButton( // Botón con contorno
+                    onClick = {
+                        showSaveDialog = false
+                        val updatedTicket = ticket.copy(
+                            id = id,
+                            restaurante = restaurante,
+                            cif = cif,
+                            fecha = fecha,
+                            hora = hora,
+                            precioSinIva = totalSinIva,
+                            precioConIva = totalConIva,
+                            iva = iva
+                        )
+                        onConfirmClick(updatedTicket) // Guarda el ticket
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                OutlinedButton( // Botón con contorno
+                    onClick = {
+                        showSaveDialog = false // Cancela la acción
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
+                ) {
+                    Text("No")
+                }
+            },
+            title = {
+                Text(
+                    text = "Guardar Ticket",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onSurface // Color coherente
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que deseas guardar los cambios en este ticket?",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface // Color coherente
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.surface, // Fondo del diálogo
+            tonalElevation = 8.dp, // Elevación para sombra
+            shape = MaterialTheme.shapes.medium // Bordes redondeados
+        )
+    }
+
 }
 
 @Composable
@@ -311,3 +435,4 @@ fun obtenerFechaActual(): String {
     val formato = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     return fechaActual.format(formato)
 }
+

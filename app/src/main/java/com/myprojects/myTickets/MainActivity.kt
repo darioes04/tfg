@@ -3,7 +3,6 @@ package com.myprojects.myTickets
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
     private var isLoading by mutableStateOf(false)
     private var isCancelled by mutableStateOf(false)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +90,13 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateToList = {
                                 navController.navigate("listTicketScreen")
+                            },
+                            onLogoutClick = { // Nueva función para cerrar sesión
+                                FirebaseAuth.getInstance().signOut() // Cierra la sesión de Firebase
+                                googleSignInClient.signOut().addOnCompleteListener { // Cierra sesión de Google
+                                    Toast.makeText(this@MainActivity, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("googleSignInScreen") // Vuelve a la pantalla de inicio de sesión
+                                }
                             }
                         )
                     }
@@ -140,22 +147,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onClickDelete = {
-                                    lifecycleScope.launch {
-                                        try {
-                                            firebaseHelper.deleteTicket(ticket.id) // Borra el ticket en Firebase
-                                            Toast.makeText(
-                                                this@MainActivity,
-                                                "Ticket eliminado",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.navigate("home") // Vuelve a la pantalla principal
-                                        } catch (e: Exception) {
-                                            Toast.makeText(
-                                                this@MainActivity,
-                                                "Error al eliminar el ticket: ${e.message}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
+                                    Toast.makeText(this@MainActivity, "Ticket cancelado", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("home") {
+                                        popUpTo("home") { inclusive = true } // Elimina pantallas previas del historial
                                     }
                                 }
                             )

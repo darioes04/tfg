@@ -158,7 +158,7 @@ fun ListTicketScreen(
                     onDownloadClick(filteredTickets)
                     showDialog = false // Close dialog
                 }) {
-                    Text("Yes")
+                    Text("Sí")
                 }
             },
             dismissButton = {
@@ -294,7 +294,6 @@ fun CalendarButton(onDateSelected: (String) -> Unit) {
                         val localDate = "$day/$month/$year"
                         onDateSelected(localDate)
                     }
-
                 }) {
                     Text(text = "Confirmar")
                 }
