@@ -1,6 +1,7 @@
 package com.myprojects.myTickets
 
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -8,6 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -27,6 +32,7 @@ import com.myprojects.myTickets.ticketView.*
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.*
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private lateinit var googleAuthHelper: GoogleAuthHelper
@@ -157,19 +163,35 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("editTicketScreen") {
+
+                        // Estado para mostrar el diálogo
+                        var showDateDialog by remember { mutableStateOf(false) }
+
+                        // Renderizar el diálogo si el estado es verdadero
+                        if (showDateDialog) {
+                            DateUtils.DateFormatAlertDialog(
+                                onDismiss = { showDateDialog = false }
+                            )
+                        }
                         ticketState.value?.let { ticket ->
                             TicketScreen(
                                 ticket = ticket,
                                 onConfirmClick = { updatedTicket ->
                                     lifecycleScope.launch {
                                         try {
-                                            firebaseHelper.updateTicket(updatedTicket)
-                                            Toast.makeText(
-                                                this@MainActivity,
-                                                "Ticket guardado correctamente",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.navigate("home")
+                                            if(DateUtils.isDateValid(updatedTicket.fecha)){
+                                                firebaseHelper.updateTicket(updatedTicket)
+                                                Toast.makeText(
+                                                    this@MainActivity,
+                                                    "Ticket guardado correctamente",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                navController.navigate("listTicketScreen")
+                                            }
+                                            else{
+                                                showDateDialog = true
+
+                                            }
                                         } catch (e: Exception) {
                                             Toast.makeText(
                                                 this@MainActivity,
@@ -292,6 +314,10 @@ class MainActivity : ComponentActivity() {
             false
         }
     }
+
+
+
+
 
 
 

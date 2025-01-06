@@ -162,10 +162,7 @@ fun ConfirmImageScreen(
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 25.dp
             ) {
-
-
                 if (isLoading) {
                     LoadingAnimation() // Mostrar la animación de carga
                 } else {

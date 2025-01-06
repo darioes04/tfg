@@ -11,11 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -124,7 +124,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                verticalAlignment = Alignment.Top
                             ) {
                                 EditableCell(
                                     label = "Producto",
@@ -260,7 +260,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                 showDeleteDialog = false // Cierra el diálogo
             },
             confirmButton = {
-                OutlinedButton( // Botón con contorno
+                Button( // Botón con contorno
                     onClick = {
                         showDeleteDialog = false
                         onClickDelete(ticket.id ?: "") // Elimina el ticket
@@ -268,20 +268,18 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                 ) {
                     Text("Sí")
                 }
             },
             dismissButton = {
-                OutlinedButton( // Botón con contorno
+                Button( // Botón con contorno
                     onClick = {
                         showDeleteDialog = false // Cancela la acción
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                 ) {
                     Text("No")
 
@@ -325,7 +323,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                 showSaveDialog = false // Cierra el diálogo
             },
             confirmButton = {
-                OutlinedButton( // Botón con contorno
+                Button( // Botón con contorno
                     onClick = {
                         showSaveDialog = false
                         val updatedTicket = ticket.copy(
@@ -343,20 +341,18 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                 ) {
                     Text("Sí")
                 }
             },
             dismissButton = {
-                OutlinedButton( // Botón con contorno
+                Button( // Botón con contorno
                     onClick = {
                         showSaveDialog = false // Cancela la acción
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder // Contorno predeterminado
                 ) {
                     Text("No")
                 }
@@ -394,17 +390,23 @@ fun TableHeader(text: String, modifier: Modifier) {
     )
 }
 
+
 @Composable
-fun EditableCell(label: String, value: String, modifier: Modifier, onValueChange: (String) -> Unit) {
+fun EditableCell(
+    label: String,
+    value: String,
+    modifier: Modifier,
+    onValueChange: (String) -> Unit
+) {
     Box(
         modifier = modifier
             .border(1.dp, Color.Gray) // Añade un borde gris de 1dp
-            .padding(4.dp) // Espaciado interno dentro de la celda
+            .padding(4.dp), // Espaciado interno dentro de la celda
+        contentAlignment = Alignment.BottomStart // Alineación inferior
     ) {
         BasicTextField(
             value = value,
             onValueChange = { newValue ->
-                // Filtra la coma `,` para evitar que el usuario la escriba
                 val sanitizedValue = newValue.replace(",", "")
                 onValueChange(sanitizedValue) // Notifica el cambio al controlador de estado
             },
@@ -413,7 +415,7 @@ fun EditableCell(label: String, value: String, modifier: Modifier, onValueChange
                 color = MaterialTheme.colorScheme.onBackground
             ),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = if (label == "Precio Unidad (€)" || label == "Cantidad"|| label == "Precio Total (€)"){
+            keyboardOptions = if (label == "Precio Unidad (€)" || label == "Cantidad" || label == "Precio Total (€)") {
                 KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number // Usa el teclado numérico
                 )
@@ -423,6 +425,7 @@ fun EditableCell(label: String, value: String, modifier: Modifier, onValueChange
         )
     }
 }
+
 
 fun obtenerHoraActual(): String {
     val horaActual = LocalTime.now()

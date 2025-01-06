@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -153,18 +154,22 @@ fun HomeScreen(
                         showDialog = false
                         onLogoutClick()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
                 ) {
-                    Text("Sí", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Sí")
                 }
             },
             dismissButton = {
                 // Botón "No" con el mismo color
                 Button(
                     onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
                 ) {
-                    Text("No", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("No")
                 }
             }
         )

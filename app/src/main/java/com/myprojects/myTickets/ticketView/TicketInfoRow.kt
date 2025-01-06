@@ -1,6 +1,7 @@
 package com.myprojects.myTickets.ticketView
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -15,13 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -30,40 +32,49 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
 
     var textFieldValue by remember { mutableStateOf(value) }
 
+    val visualTransformation = VisualTransformation { text ->
+        val transformedText = "$text $symbol"
+        TransformedText(
+            AnnotatedString(transformedText),
+            object : OffsetMapping {
+                override fun originalToTransformed(offset: Int): Int {
+                    return offset // Los índices originales se mantienen iguales
+                }
+
+                override fun transformedToOriginal(offset: Int): Int {
+                    return offset.coerceAtMost(text.length) // Ajusta para que no exceda el tamaño del texto original
+                }
+            }
+        )
+    }
+
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)) // Fondo redondeado
+            .padding(horizontal = 12.dp, vertical = 3.dp), // Espaciado interno
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Etiqueta
         Text(
-            text = "$label: ",
-            fontWeight = FontWeight.SemiBold,
+            text = "$label:",
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.alignByBaseline(),
-            color = MaterialTheme.colorScheme.onBackground // Ajuste automático al modo oscuro/claro
+            fontSize = 16.sp // Tamaño ligeramente más grande
         )
 
         Box(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
-                .drawBehind {
-                    val strokeWidth = 2.dp.toPx() // Grosor de la línea
-                    val y = size.height - strokeWidth / 2 // Posición de la línea en la parte inferior
-                    drawLine(
-                        color = Color.Magenta,
-                        start = Offset(0f, y), // Extiende la línea más allá a la izquierda
-                        end = Offset(size.width + 16f, y),
-                        strokeWidth = strokeWidth // Grosor de la línea
-                    )
-                }
-                .background(Color.Transparent)
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp)) // Borde estilizado
+                .background(MaterialTheme.colorScheme.surface) // Fondo acorde al tema
+                .padding(horizontal = 8.dp, vertical = 1.dp)
                 .width(IntrinsicSize.Min)
         ) {
             BasicTextField(
                 value = textFieldValue,
                 onValueChange = { newValue ->
-                    // Filtra la coma `,` para evitar que el usuario la escriba
                     val sanitizedValue = newValue.replace(",", "")
                     textFieldValue = sanitizedValue
                     onValueChange(sanitizedValue)
@@ -71,28 +82,27 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(2.dp),
-                keyboardOptions = if (label == "IVA" || label == "Precio sin IVA" || label == "Precio con IVA"){
+                keyboardOptions = if (label == "IVA" || label == "Precio sin IVA" || label == "Precio con IVA") {
                     KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number // Usa el teclado numérico
+                        keyboardType = KeyboardType.Number
                     )
                 } else {
-                    KeyboardOptions.Default // Usa el teclado por defecto
+                    KeyboardOptions.Default
                 },
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp
                 ),
+                visualTransformation = visualTransformation
             )
         }
-
-        Text(
-            text = symbol,
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.Bold,
-        )
-
     }
+
+
+
 }
+
+
 
 
 
