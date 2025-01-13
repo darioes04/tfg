@@ -26,7 +26,7 @@ object DateUtils {
             onDismissRequest = { onDismiss() },
             title = {
                 Text(
-                    text = "Formato de Fecha Inválido",
+                    text = "Formato de Fecha/Hora inválido",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onSurface
@@ -34,7 +34,8 @@ object DateUtils {
             },
             text = {
                 Text(
-                    text = "La fecha debe ser válida y tener el siguiente formato: dd/MM/YYYY. Compruebe la fecha por favor.",
+                    text = "La fecha y la hora deben ser válidas y tener los formatos: dd/MM/YYYY - HH:mm." +
+                            " Compruebe estos campos, por favor.",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -51,25 +52,35 @@ object DateUtils {
     }
 
 
-    fun isDateValid(fecha: String): Boolean {
+    fun isDateTimeValid(fecha: String, hora: String): Boolean {
         // Expresión regular para validar el formato dd/MM/yyyy
-        val regex = Regex("^\\d{2}/\\d{2}/\\d{4}$")
+        val dateRegex = Regex("^\\d{2}/\\d{2}/\\d{4}$")
+        // Expresión regular para validar el formato HH:mm
+        val timeRegex = Regex("^([01]?\\d|2[0-3]):[0-5]\\d$")
 
-        // Si no coincide con el formato exacto, retornar falso
-        if (!regex.matches(fecha)) {
+        // Validar formato de fecha
+        if (!dateRegex.matches(fecha)) {
             return false
         }
 
-        // Definir el formato esperado
-        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        formato.isLenient = false // No permitir fechas inválidas como 32/01/2024
+        // Validar formato de hora
+        if (!timeRegex.matches(hora)) {
+            return false
+        }
+
+        // Validar si la fecha es válida
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        dateFormat.isLenient = false
+
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        timeFormat.isLenient = false
 
         return try {
-            // Intentar parsear la fecha
-            formato.parse(fecha)
-            true
+            dateFormat.parse(fecha) // Intentar parsear la fecha
+            timeFormat.parse(hora)  // Intentar parsear la hora
+            true // Ambas son válidas
         } catch (e: Exception) {
-            false
+            false // Alguna es inválida
         }
     }
 

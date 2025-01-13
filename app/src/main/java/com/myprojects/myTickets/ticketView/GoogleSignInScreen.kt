@@ -1,63 +1,37 @@
-package com.myprojects.myTickets.ticketView
+    package com.myprojects.myTickets.ticketView
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.myprojects.prueba1.R
+    import androidx.compose.foundation.Image
+    import androidx.compose.foundation.background
+    import androidx.compose.foundation.border
+    import androidx.compose.foundation.layout.*
+    import androidx.compose.foundation.shape.CircleShape
+    import androidx.compose.material3.Button
+    import androidx.compose.material3.ButtonDefaults
+    import androidx.compose.material3.MaterialTheme
+    import androidx.compose.material3.Text
+    import androidx.compose.runtime.Composable
+    import androidx.compose.ui.Alignment
+    import androidx.compose.ui.Modifier
+    import androidx.compose.ui.draw.clip
+    import androidx.compose.ui.graphics.Color
+    import androidx.compose.ui.res.painterResource
+    import androidx.compose.ui.text.font.FontWeight
+    import androidx.compose.ui.text.style.TextAlign
+    import androidx.compose.ui.unit.dp
+    import com.myprojects.prueba1.R
 
-@Composable
-fun GoogleSignInScreen(onSignInClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    @Composable
+    fun GoogleSignInScreen(onSignInClick: () -> Unit) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp), contentAlignment = Alignment.Center
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(bottom = 16.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                // Icono de Google
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "Google Icon",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(end = 8.dp) // Espacio entre el icono y la imagen
-                )
-
                 // Imagen personalizada
                 Image(
                     painter = painterResource(id = R.drawable.icono), // Imagen desde recursos
@@ -66,61 +40,78 @@ fun GoogleSignInScreen(onSignInClick: () -> Unit) {
                         .size(62.dp)
                         .clip(CircleShape)
                 )
-            }
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "Bienvenido a MyTickets",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+                Text(
+                    text = "Bienvenido a MyTickets",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground // Cambia dinámicamente según el tema
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                text = "Inicia sesión con Google para continuar",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center
-            )
+                // Eslogan
+                Text(
+                    text = "Organiza tus tickets, simplifica tu vida",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary, // Usa el color primario de la app
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            Button(
-                onClick = onSignInClick,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(60.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                Text(
+                    text = "Inicia sesión con Google para continuar",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground, // Cambia dinámicamente según el tema
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = onSignInClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent, // Fondo transparente
+                        contentColor = MaterialTheme.colorScheme.primary // Texto del botón
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(60.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.Red, // Borde rojo
+                            shape = CircleShape
+                        )
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.google_icon),
-                        contentDescription = "Google Logo",
-                        modifier = Modifier
-                            .size(62.dp)
-                            .clip(CircleShape)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.google_icon),
+                            contentDescription = "Google Logo",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(CircleShape)
+                        )
 
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Iniciar sesión con Google",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = "Iniciar sesión con Google",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary // Texto rojo
+                        )
+                    }
                 }
+
+
+
+                Spacer(modifier = Modifier.height(16.dp))
+
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "No compartimos tus datos personales.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center
-            )
         }
     }
-
-}

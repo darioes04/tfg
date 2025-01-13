@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">MyTickets</string>
+
+    <!-- Textos en español -->
+    <string name="settings_es">Ajustes</string>
+    <string name="select_language_es">Selecciona un idioma</string>
+    <string name="logout_es">Cerrar Sesión</string>
+    <string name="logout_message_es">¿Estás seguro de que deseas cerrar la sesión?</string>
+    <string name="logout_confirm_es">Aceptar</string>
+    <string name="logout_cancel_es">Cancelar</string>
+    <string name="select_ticket_es">Selecciona un ticket</string>
+    <string name="to_scan_es">para escanear</string>
+    <string name="camera_es">Cámara</string>
+    <string name="gallery_es">Galería</string>
+    <string name="saved_tickets_es">Tickets Guardados</string>
+
+    <!-- Textos en inglés -->
+    <string name="settings_en">Settings</string>
+    <string name="select_language_en">Select a language</string>
+    <string name="logout_en">Logout</string>
+    <string name="logout_message_en">Are you sure you want to log out?</string>
+    <string name="logout_confirm_en">Confirm</string>
+    <string name="logout_cancel_en">Cancel</string>
+    <string name="select_ticket_en">Select a ticket</string>
+    <string name="to_scan_en">to scan</string>
+    <string name="camera_en">Camera</string>
+    <string name="gallery_en">Gallery</string>
+    <string name="saved_tickets_en">Saved Tickets</string>
+
 </resources>

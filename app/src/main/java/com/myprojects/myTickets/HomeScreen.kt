@@ -1,21 +1,26 @@
 package com.myprojects.myTickets
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,7 +29,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,104 +38,164 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.myprojects.myTickets.utils.getLocalizedString
+import com.myprojects.prueba1.R
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
+    language: String, // Idioma actual ("es" o "en")
     onCameraClick: () -> Unit = {},
     onGalleryClick: () -> Unit = {},
     onNavigateToList: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
-    // Estado para controlar la visibilidad del diálogo de confirmación
-    var showDialog by remember { mutableStateOf(false) }
+
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp) // Padding superior para separar del borde
+                    .padding(top = 10.dp)
             ) {
-                // Primera fila: Icono alineado a la derecha arriba
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp), // Padding horizontal
-                    horizontalArrangement = Arrangement.End // Alinea a la derecha
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(
-                        onClick = { showDialog = true } // Muestra el diálogo de confirmación
-                    ) {
+                    IconButton(onClick = { onSettingsClick() }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = getLocalizedString("settings", language),
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    IconButton(onClick = { showLogoutDialog = true }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Cerrar Sesión",
+                            contentDescription = getLocalizedString("logout", language),
                             tint = Color.Red,
                             modifier = Modifier.size(32.dp)
                         )
                     }
                 }
-
-                // Segunda fila: Texto "MyTickets" centrado
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp), // Espaciado entre el icono y el texto
-                    horizontalArrangement = Arrangement.Center // Centra el texto
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icono), // Logo
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     Text(
                         text = "MyTickets",
-                        fontSize = 50.sp,
-                        fontFamily = FontFamily.Default,
+                        fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = Color(0xFFE53935)
                     )
                 }
             }
         },
-                content = { paddingValues ->
+        content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
                     .padding(paddingValues),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Sección para botones de cámara y galería
-                IconRowSection(
-                    onCameraClick = onCameraClick,
-                    onGalleryClick = onGalleryClick
+                Text(
+                    text = getLocalizedString("select_ticket", language),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
+                Text(
+                    text = getLocalizedString("to_scan", language),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ActionButton(
+                        icon = Icons.Default.Camera,
+                        label = getLocalizedString("camera", language),
+                        color = Color(0xFFE53935),
+                        onClick = onCameraClick
+                    )
+                    ActionButton(
+                        icon = Icons.Default.Photo,
+                        label = getLocalizedString("gallery", language),
+                        color = Color(0xFFE53935),
+                        onClick = onGalleryClick
+                    )
+                }
             }
         },
         bottomBar = {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center, // Cambia a Center para centrar todo el contenido
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                // Card centrada en el eje Y y en el centro horizontal
-                AccessSavedTicketsCard(onClick = onNavigateToList)
-
-                Spacer(modifier = Modifier.width(16.dp)) // Espacio entre la Card y el IconButton
+                Card(
+                    modifier = Modifier
+                        .clickable { onNavigateToList() },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)) // Gris claro
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Receipt,
+                            contentDescription = "Tickets",
+                            tint = Color(0xFFE53935),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = getLocalizedString("saved_tickets", language),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF424242) // Gris oscuro
+                        )
+                    }
                 }
+            }
         }
     )
-
-    // Diálogo de Confirmación - Botones con el mismo color
-    if (showDialog) {
+    if (showLogoutDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { showLogoutDialog = false },
             title = {
                 Text(
                     text = "Cerrar Sesión",
@@ -151,69 +215,61 @@ fun HomeScreen(
                 // Botón "Sí" con el mismo color
                 Button(
                     onClick = {
-                        showDialog = false
+                        showLogoutDialog = false
                         onLogoutClick()
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
                 ) {
-                    Text("Sí")
+                    Text("Aceptar")
                 }
             },
             dismissButton = {
                 // Botón "No" con el mismo color
                 Button(
-                    onClick = { showDialog = false },
+                    onClick = { showLogoutDialog = false },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
                 ) {
-                    Text("No")
+                    Text("Cancelar")
                 }
             }
         )
     }
 }
 
-
 @Composable
-fun AccessSavedTicketsCard(onClick: () -> Unit) {
-    Card(
+fun ActionButton(icon: ImageVector, label: String, color: Color, onClick: () -> Unit) {
+    // Botón cuadrado
+    Box(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+            .size(80.dp) // Tamaño fijo para ancho y alto iguales
+            .background(
+                color = color,
+                shape = RoundedCornerShape(15.dp)
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
     ) {
-        Row(
-            modifier = Modifier
-
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Filled.Receipt, // Ícono representativo
-                contentDescription = "Tickets Guardados",
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
+                imageVector = icon,
+                contentDescription = label,
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
             Text(
-                text = "Tickets",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                text = label,
+                fontSize = 12.sp, // Texto más pequeño
+                color = Color.White, // Texto blanco
+                maxLines = 1 // Asegura que el texto no se desborde
             )
         }
     }
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreen() {
-}

@@ -2,6 +2,7 @@ package com.myprojects.myTickets.database
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.myprojects.myTickets.data.Producto
 import com.myprojects.myTickets.data.Ticket
@@ -209,4 +210,67 @@ class FireBaseHelper {
         val userId = getUserId() ?: throw IllegalStateException("Usuario no autenticado")
         db.collection("users").document(userId).collection("tickets").document(ticketId).delete().await()
     }
+
+     suspend fun saveUserEmailToFirestore() {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userEmail = user.email ?: "Sin email"
+            val db = FirebaseFirestore.getInstance()
+
+            // Referencia al documento del usuario
+            val userRef = db.collection("users").document(userId)
+
+            // Actualiza o crea el documento del usuario con el campo email
+            val userData = hashMapOf(
+                "email" to userEmail // Campo email
+            )
+
+            userRef.set(userData)
+                .addOnSuccessListener {
+                    Log.d("Firestore", "Email del usuario guardado correctamente")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firestore", "Error al guardar el email del usuario: ${e.message}")
+                }
+        } else {
+            Log.e("Firestore", "Usuario no autenticado")
+        }
+    }
+
+    suspend fun deleteAccountAndTickets(): Boolean {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            Log.e("Firestore", "Usuario no autenticado")
+            throw IllegalStateException("Usuario no autenticado")
+        }
+
+        val userId = user.uid
+        val db = FirebaseFirestore.getInstance()
+
+        return try {
+            // Eliminar todos los tickets del usuario
+            val ticketsCollection = db.collection("users").document(userId).collection("tickets")
+            val ticketsSnapshot = ticketsCollection.get().await()
+            for (ticket in ticketsSnapshot) {
+                ticket.reference.delete().await() // Eliminar cada ticket
+            }
+
+            // Eliminar el documento del usuario
+            db.collection("users").document(userId).delete().await()
+
+            // Finalmente, elimina la cuenta de Firebase Authentication
+            user.delete().await()
+
+            Log.d("Firestore", "Cuenta y tickets eliminados correctamente")
+            true
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al eliminar la cuenta y los tickets: ${e.message}")
+            false
+        }
+    }
+
+
+
+
 }

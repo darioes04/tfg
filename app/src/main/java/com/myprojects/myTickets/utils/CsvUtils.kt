@@ -11,7 +11,10 @@ import java.util.Locale
 object CsvUtils {
 
     fun exportTicketsToCSV(context: Context, tickets: List<Ticket>): Uri? {
+
         val csvHeader = "Restaurante;CIF;Fecha;Hora;Productos;PrecioSinIVA(€);IVA(%);PrecioConIVA(€)\n"
+
+
         val fileName = "tickets.csv"
 
         // Configuración de MediaStore para almacenar el archivo en la carpeta "Descargas"
@@ -28,8 +31,12 @@ object CsvUtils {
         return if (uri != null) {
             try {
                 resolver.openOutputStream(uri)?.use { outputStream ->
+                    // Escribir encabezado con BOM para UTF-8
+                    val bom = "\uFEFF" // Indicador de orden de bytes (BOM) para UTF-8
+                    outputStream.write(bom.toByteArray(Charsets.UTF_8))
+
                     // Escribir encabezado
-                    outputStream.write(csvHeader.toByteArray())
+                    outputStream.write(csvHeader.toByteArray(Charsets.UTF_8))
 
                     var total = 0.00
                     // Escribir datos de los tickets
@@ -38,13 +45,13 @@ object CsvUtils {
                         val csvRow = "${ticket.restaurante};${ticket.cif};" +
                                 "${ticket.fecha};${ticket.hora};${ticket.items};${ticket.precioSinIva};${ticket.iva};" +
                                 "${ticket.precioConIva}\n"
-                        outputStream.write(csvRow.toByteArray())
+                        outputStream.write(csvRow.toByteArray(Charsets.UTF_8))
                     }
+
                     val totalFormatted = String.format(Locale.US, "%.2f", total)
                     val csvRow = ";;;;;;;$totalFormatted"
-                    outputStream.write(csvRow.toByteArray())
+                    outputStream.write(csvRow.toByteArray(Charsets.UTF_8))
                 }
-
                 // Mostrar mensaje de éxito
                 Toast.makeText(context, "Archivo CSV generado en la carpeta Descargas", Toast.LENGTH_SHORT).show()
                 uri

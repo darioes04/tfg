@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -107,4 +108,8 @@ dependencies {
     implementation (libs.firebase.auth)
     implementation (libs.play.services.auth)
     implementation (libs.firebase.firestore)
+    implementation (libs.androidx.ui.text.google.fonts.v150)
+    implementation ("androidx.compose.ui:ui-text-google-fonts:1.7.6")
+    implementation ("androidx.compose.material3:material3:1.1.0")
+
 }

@@ -1,6 +1,7 @@
 package com.myprojects.myTickets.ticketView
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.*
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.LayoutDirection
 import com.myprojects.myTickets.database.FireBaseHelper
 import java.time.Instant
@@ -64,6 +66,7 @@ fun ListTicketScreen(
     var selectedDate by remember { mutableStateOf("") }
     var filteredTickets by remember { mutableStateOf(tickets) }
 
+
     // Filtrar los tickets dinámicamente al cambiar el texto de búsqueda
     LaunchedEffect(searchQuery, tickets) {
         filteredTickets = tickets.filter { ticket ->
@@ -82,13 +85,25 @@ fun ListTicketScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { onHomeClick() }) {
-                    Icon(
-                        imageVector = Icons.Filled.Home,
-                        contentDescription = "Volver a Home",
-                        modifier = Modifier.size(32.dp)
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(50.dp) // Tamaño del fondo
+                        .background(
+                            color = Color(0xFFB0BEC5), // Fondo gris
+                            shape = RoundedCornerShape(12.dp) // Esquinas redondeadas
+                        ),
+                    contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                ) {
+                    IconButton(onClick = { onHomeClick() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Home,
+                            contentDescription = "Volver a Home",
+                            tint = Color.Black, // Ícono blanco para contraste
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
+
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -101,13 +116,26 @@ fun ListTicketScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = { showDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.SaveAlt,
-                        contentDescription = "Descargar Tickets",
-                        modifier = Modifier.size(32.dp)
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(50.dp) // Tamaño del fondo
+                        .background(
+                            color = Color(0xFFB0BEC5), // Fondo gris
+                            shape = RoundedCornerShape(12.dp) // Esquinas redondeadas
+                        ),
+                    contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                ) {
+                    IconButton(onClick = { showDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.SaveAlt,
+                            contentDescription = "Descargar Tickets",
+                            tint = Color.Black,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
+
+
             }
         },
         content = { paddingValues ->
@@ -151,18 +179,32 @@ fun ListTicketScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(text = "Export Tickets") },
+            title = { Text(text = "Exportar Tickets") },
             text = { Text(text = "¿Estás seguro de que deseas exportar los tickets a un archivo .csv?") },
             confirmButton = {
-                Button(onClick = {
-                    onDownloadClick(filteredTickets)
-                    showDialog = false // Close dialog
-                }) {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        onDownloadClick(filteredTickets)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                ) {
                     Text("Sí")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) {
+                Button(
+                    onClick = {
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                ) {
                     Text("No")
                 }
             }
@@ -201,7 +243,7 @@ fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
                     Icon(
                         imageVector = Icons.Filled.CalendarToday,
                         contentDescription = "Fecha",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color(0xFFE53935),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -215,7 +257,7 @@ fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Restaurant,
                 contentDescription = "Detalles del ticket",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Color(0xFFE53935),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -259,12 +301,16 @@ fun CalendarButton(onDateSelected: (String) -> Unit) {
 
     Button(
         onClick = { showDialog = true },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFE53935), // Fondo rojo
+            contentColor = Color.Black // Texto blanco
+        )
     ) {
         Row {
             Icon(
                 imageVector = Icons.Filled.CalendarMonth,
                 contentDescription = "Fecha",
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = Color.Black,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -280,6 +326,7 @@ fun CalendarButton(onDateSelected: (String) -> Unit) {
             confirmButton = {
                 Button(onClick = {
                     showDialog = false
+
                     val date = state.selectedDateMillis
                     date?.let {
                         val formattedDate = Instant.ofEpochMilli(it)
@@ -294,13 +341,21 @@ fun CalendarButton(onDateSelected: (String) -> Unit) {
                         val localDate = "$day/$month/$year"
                         onDateSelected(localDate)
                     }
-                }) {
+                },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),) {
                     Text(text = "Confirmar")
                 }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showDialog = false }) {
-                    Text(text = "Cancelar")
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                    ),
+                ) {
+                    Text("Cancelar")
                 }
             }
         ) {

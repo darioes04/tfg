@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,7 +68,7 @@ fun TicketInfoRow(label: String, value: String, symbol: String, onValueChange: (
         Box(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
-                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp)) // Borde estilizado
+                .border(1.dp, color = Color(0xFFB0BEC5), RoundedCornerShape(4.dp)) // Borde estilizado
                 .background(MaterialTheme.colorScheme.surface) // Fondo acorde al tema
                 .padding(horizontal = 8.dp, vertical = 1.dp)
                 .width(IntrinsicSize.Min)

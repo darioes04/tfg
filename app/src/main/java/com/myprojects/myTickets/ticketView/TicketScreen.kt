@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,6 +32,7 @@ import com.myprojects.myTickets.data.Ticket
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -73,7 +75,11 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item {
-                            TicketInfoRow(label = "Restaurante", value = restaurante, "") { newValue ->
+                            TicketInfoRow(
+                                label = "Restaurante",
+                                value = restaurante,
+                                ""
+                            ) { newValue ->
                                 restaurante = newValue
                             }
                         }
@@ -83,7 +89,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                             }
                         }
                         item {
-                            if(fecha == "DESCONOCIDA"){
+                            if (fecha == "DESCONOCIDA") {
                                 fecha = obtenerFechaActual()
                             }
                             TicketInfoRow(label = "Fecha", value = fecha, "") { newValue ->
@@ -91,7 +97,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                             }
                         }
                         item {
-                            if(hora == "DESCONOCIDA"){
+                            if (hora == "DESCONOCIDA") {
                                 hora = obtenerHoraActual()
                             }
                             TicketInfoRow(label = "Hora", value = hora, "") { newValue ->
@@ -106,13 +112,19 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                                    .background(Color(0xFFB0BEC5)),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 TableHeader(text = "Producto", modifier = Modifier.weight(2f))
-                                TableHeader(text = "Precio Unidad (€)", modifier = Modifier.weight(1f))
-                                TableHeader(text = "Cantidad", modifier = Modifier.weight(1f))
-                                TableHeader(text = "Precio Total (€)", modifier = Modifier.weight(1f))
+                                TableHeader(
+                                    text = "Precio Unidad (€)",
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TableHeader(text = "Uds.", modifier = Modifier.weight(1f))
+                                TableHeader(
+                                    text = "Precio Total (€)",
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
                         }
 
@@ -132,7 +144,8 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                     modifier = Modifier.weight(2f)
                                 ) { newValue ->
                                     val updatedProducts = ticket.items.toMutableList()
-                                    updatedProducts[index] = updatedProducts[index].copy(item = newValue)
+                                    updatedProducts[index] =
+                                        updatedProducts[index].copy(item = newValue)
                                     ticket = ticket.copy(items = updatedProducts)
                                 }
                                 EditableCell(
@@ -141,17 +154,19 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
                                     val updatedProducts = ticket.items.toMutableList()
-                                    updatedProducts[index] = updatedProducts[index].copy(precioUnidad = newValue)
+                                    updatedProducts[index] =
+                                        updatedProducts[index].copy(precioUnidad = newValue)
                                     ticket = ticket.copy(items = updatedProducts)
                                 }
 
                                 EditableCell(
-                                    label = "Cantidad",
+                                    label = "Cantidad.",
                                     value = product.cantidad,
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
                                     val updatedProducts = ticket.items.toMutableList()
-                                    updatedProducts[index] = updatedProducts[index].copy(cantidad = newValue)
+                                    updatedProducts[index] =
+                                        updatedProducts[index].copy(cantidad = newValue)
                                     ticket = ticket.copy(items = updatedProducts)
                                 }
 
@@ -161,7 +176,8 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                                     modifier = Modifier.weight(1f)
                                 ) { newValue ->
                                     val updatedProducts = ticket.items.toMutableList()
-                                    updatedProducts[index] = updatedProducts[index].copy(precioFinal = newValue)
+                                    updatedProducts[index] =
+                                        updatedProducts[index].copy(precioFinal = newValue)
                                     ticket = ticket.copy(items = updatedProducts)
                                 }
                             }
@@ -170,7 +186,11 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
 
                         // Fila para Precio Sin IVA
                         item {
-                            TicketInfoRow(label = "Precio sin IVA", value = totalSinIva, "€") { newValue ->
+                            TicketInfoRow(
+                                label = "Precio sin IVA",
+                                value = totalSinIva,
+                                "€"
+                            ) { newValue ->
                                 totalSinIva = newValue
                                 ticket = ticket.copy(precioSinIva = newValue)
                             }
@@ -186,7 +206,11 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
 
                         // Fila para Precio Con IVA
                         item {
-                            TicketInfoRow(label = "Precio con IVA", value = totalConIva, "€") { newValue ->
+                            TicketInfoRow(
+                                label = "Precio con IVA",
+                                value = totalConIva,
+                                "€"
+                            ) { newValue ->
                                 totalConIva = newValue
                                 ticket = ticket.copy(precioConIva = newValue)
                             }
@@ -200,55 +224,73 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            IconButton(
-                                onClick = { showDeleteDialog = true }
+                        // Botón de eliminar
+                        Box(
+                            modifier = Modifier
+                                .size(70.dp) // Tamaño del fondo
+                                .background(
+                                    color = Color(0xFFB0BEC5), // Fondo gris
+                                    shape = RoundedCornerShape(12.dp) // Esquinas redondeadas
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy((-5).dp) // Espacio reducido entre icono y texto
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Delete,
-                                    contentDescription = "Eliminar Ticket",
-                                    modifier = Modifier
-                                        .size(48.dp)
-
-                                )
-                            }
-                            Text(
-                                text = "Eliminar",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            IconButton(
-                                onClick = {
-                                    showSaveDialog = true
+                                IconButton(
+                                    onClick = { showDeleteDialog = true }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = "Eliminar Ticket",
+                                        tint = Color.Black, // Ícono blanco
+                                        modifier = Modifier.size(35.dp)
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Save,
-                                    contentDescription = "Confirmar Cambios",
-                                    modifier = Modifier.size(48.dp)
+                                Text(
+                                    text = "Eliminar",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Black // Texto blanco
                                 )
                             }
-                            Text(
-                                text = "Guardar",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
                         }
 
-                    }
+
+                        // Botón de guardar
+                            Box(
+                                modifier = Modifier
+                                    .size(70.dp) // Tamaño del fondo
+                                    .background(
+                                        color = Color(0xFFB0BEC5),
+                                        shape = RoundedCornerShape(12.dp) // Esquinas redondeadas
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy((-5).dp) // Espacio reducido entre icono y texto
+                                ) {
+                                    IconButton(
+                                        onClick = { showSaveDialog = true }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Save,
+                                            contentDescription = "Confirmar Cambios",
+                                            tint = Color.Black, // Ícono blanco
+                                            modifier = Modifier.size(36.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = "Guardar",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color.Black // Texto blanco
+                                    )
+                                }
+                            }
+                        }
                 }
             }
         }
@@ -266,10 +308,10 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         onClickDelete(ticket.id ?: "") // Elimina el ticket
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary // Color primario
+                        contentColor = MaterialTheme.colorScheme.primary
                     ),
                 ) {
-                    Text("Sí")
+                    Text("Confirmar")
                 }
             },
             dismissButton = {
@@ -281,7 +323,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
                 ) {
-                    Text("No")
+                    Text("Cancelar")
 
                 }
             },
@@ -342,7 +384,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
                 ) {
-                    Text("Sí")
+                    Text("Aceptar")
                 }
             },
             dismissButton = {
@@ -354,7 +396,7 @@ fun TicketScreen(ticket: Ticket, onConfirmClick: (Ticket) -> Unit, onClickDelete
                         contentColor = MaterialTheme.colorScheme.primary // Color primario
                     ),
                 ) {
-                    Text("No")
+                    Text("Cancelar")
                 }
             },
             title = {
@@ -400,7 +442,7 @@ fun EditableCell(
 ) {
     Box(
         modifier = modifier
-            .border(1.dp, Color.Gray) // Añade un borde gris de 1dp
+            .border(1.dp, Color(0xFFB0BEC5)) // Añade un borde gris de 1dp
             .padding(4.dp), // Espaciado interno dentro de la celda
         contentAlignment = Alignment.BottomStart // Alineación inferior
     ) {

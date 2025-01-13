@@ -1,18 +1,14 @@
 package com.myprojects.myTickets
 
 import android.content.Intent
-import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -32,7 +28,6 @@ import com.myprojects.myTickets.ticketView.*
 import com.myprojects.myTickets.ui.theme.MyTicketsTheme
 import com.myprojects.myTickets.utils.*
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private lateinit var googleAuthHelper: GoogleAuthHelper
@@ -50,12 +45,16 @@ class MainActivity : ComponentActivity() {
     private var isLoading by mutableStateOf(false)
     private var isCancelled by mutableStateOf(false)
 
+    private var currentLanguage by mutableStateOf("es")
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         googleAuthHelper = GoogleAuthHelper(this)
         googleSignInClient = googleAuthHelper.getGoogleSignInClient()
+
 
         PermissionManager.checkAndRequestPermissions(this)
 
@@ -78,6 +77,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("googleSignInScreen") {
                         GoogleSignInScreen(onSignInClick = { signInWithGoogle() })
+
                     }
 
                     composable("home") {
@@ -97,13 +97,17 @@ class MainActivity : ComponentActivity() {
                             onNavigateToList = {
                                 navController.navigate("listTicketScreen")
                             },
-                            onLogoutClick = { // Nueva función para cerrar sesión
+                            onLogoutClick = {
                                 FirebaseAuth.getInstance().signOut() // Cierra la sesión de Firebase
                                 googleSignInClient.signOut().addOnCompleteListener { // Cierra sesión de Google
                                     Toast.makeText(this@MainActivity, "Sesión cerrada", Toast.LENGTH_SHORT).show()
                                     navController.navigate("googleSignInScreen") // Vuelve a la pantalla de inicio de sesión
                                 }
-                            }
+                            },
+                            onSettingsClick = {
+                                navController.navigate("settingsScreen")
+                            },
+                            language = currentLanguage
                         )
                     }
 
@@ -142,7 +146,7 @@ class MainActivity : ComponentActivity() {
                                                 "Ticket guardado correctamente",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                            navController.navigate("home")
+                                            navController.navigate("listTicketScreen")
                                         } catch (e: Exception) {
                                             Toast.makeText(
                                                 this@MainActivity,
@@ -173,13 +177,14 @@ class MainActivity : ComponentActivity() {
                                 onDismiss = { showDateDialog = false }
                             )
                         }
+
                         ticketState.value?.let { ticket ->
                             TicketScreen(
                                 ticket = ticket,
                                 onConfirmClick = { updatedTicket ->
                                     lifecycleScope.launch {
                                         try {
-                                            if(DateUtils.isDateValid(updatedTicket.fecha)){
+                                            if(DateUtils.isDateTimeValid(updatedTicket.fecha, updatedTicket.hora)){
                                                 firebaseHelper.updateTicket(updatedTicket)
                                                 Toast.makeText(
                                                     this@MainActivity,
@@ -210,7 +215,7 @@ class MainActivity : ComponentActivity() {
                                                 "Ticket eliminado",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                            navController.navigate("home") // Vuelve a la pantalla principal
+                                            navController.navigate("listTicketScreen") // Vuelve a la pantalla principal
                                         } catch (e: Exception) {
                                             Toast.makeText(
                                                 this@MainActivity,
@@ -243,6 +248,39 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
+                    composable("settingsScreen") {
+                        SettingsScreen(
+                            onDeleteAccount = {
+                                lifecycleScope.launch {
+                                    try {
+                                        val firebaseHelper = FireBaseHelper() // Instancia de FireBaseHelper
+                                        firebaseHelper.deleteAccountAndTickets() // Eliminar cuenta y tickets asociados
+
+                                        // Cierra la sesión tras eliminar la cuenta
+                                        FirebaseAuth.getInstance().signOut()
+                                        googleSignInClient.signOut().addOnCompleteListener {
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "Cuenta eliminada correctamente",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            navController.navigate("googleSignInScreen") // Navega a la pantalla de inicio de sesión
+                                        }
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Error al eliminar la cuenta: ${e.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            },
+                            onBackClick = {
+                                navController.popBackStack() // Vuelve a la pantalla anterior
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -255,6 +293,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Maneja el resultado del intento de inicio de sesión
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -274,13 +313,27 @@ class MainActivity : ComponentActivity() {
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    // Inicio de sesión exitoso
                     Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                    navController.navigate("home") // Redirige a home tras iniciar sesión
+
+                    // Guardar el email del usuario en Firestore
+                    lifecycleScope.launch {
+                        try {
+                            firebaseHelper.saveUserEmailToFirestore()
+                            Log.d("Firestore", "Email del usuario guardado correctamente")
+                        } catch (e: Exception) {
+                            Log.e("Firestore", "Error al guardar el email: ${e.message}")
+                        }
+                    }
+                    // Navegar a la pantalla principal
+                    navController.navigate("home")
                 } else {
+                    // Manejo del error
                     Toast.makeText(this, "Error al autenticar con Firebase", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
     private fun processImage(imageUri: Uri?, navController: NavHostController) {
         GeminiUtils.processImageWithGemini(this, imageUri) { apiResponse ->
             if (isCancelled) {
@@ -298,6 +351,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
+
 
     private fun parseTicketJson(json: String): Ticket {
         if (!isValidJson(json)) {
@@ -341,7 +397,7 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this, "Imagen seleccionada", Toast.LENGTH_SHORT).show()
                 navController.navigate("confirmImageScreen") // Usa el NavController global
             } else {
-                Toast.makeText(this, "Error al seleccionar la imagen", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show()
             }
         }
     }
